@@ -155,6 +155,7 @@
             padding: 4px 4px 4px 12px;
             width: 360px;
             transition: all 0.2s ease;
+            position: relative; /* Anchors the autocomplete dropdown */
         }
 
         .search-container:focus-within {
@@ -187,6 +188,69 @@
 
         .search-container button:hover {
             background-color: #1a4175;
+        }
+
+        /* Autocomplete dropdown styles matching premium light NSE theme */
+        .autocomplete-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: #ffffff;
+            border: 1px solid var(--border-color);
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            max-height: 280px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+
+        .autocomplete-item {
+            padding: 10px 14px;
+            cursor: pointer;
+            font-size: 14px;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.15s ease;
+            text-align: left;
+        }
+
+        .autocomplete-item:last-child {
+            border-bottom: none;
+        }
+
+        .autocomplete-item .symbol-badge {
+            font-weight: 700;
+            color: var(--accent-blue);
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 12px;
+            transition: all 0.15s ease;
+        }
+
+        .autocomplete-item .company-name {
+            color: var(--text-muted);
+            font-size: 13px;
+            text-align: right;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 220px;
+            margin-left: 10px;
+        }
+
+        .autocomplete-item:hover, .autocomplete-item.active {
+            background-color: #f1f5f9;
+        }
+
+        .autocomplete-item.active .symbol-badge {
+            background: var(--accent-gold);
+            color: var(--accent-blue);
         }
 
         main {
@@ -631,8 +695,9 @@
             </div>
         </div>
         <div class="search-container">
-            <input type="text" id="tickerInput" placeholder="Enter NSE Ticker (e.g. RELIANCE, TCS)">
+            <input type="text" id="tickerInput" placeholder="Enter NSE Ticker (e.g. RELIANCE, TCS)" autocomplete="off">
             <button onclick="handleSearch()">Search</button>
+            <div id="autocompleteDropdown" class="autocomplete-dropdown"></div>
         </div>
     </header>
 
@@ -763,6 +828,150 @@
             ? "http://127.0.0.1:8000"
             : window.location.origin;
         let activeTicker = "";
+
+        // Autocomplete State
+        let nseStocksList = [];
+        let activeSuggestionIndex = -1;
+
+        // Fetch stocks list on page load
+        async function loadStocksList() {
+            try {
+                const response = await fetch(`${API_BASE}/api/stocks`);
+                if (response.ok) {
+                    nseStocksList = await response.json();
+                    console.log(`[*] Loaded ${nseStocksList.length} stocks for autocomplete.`);
+                }
+            } catch (err) {
+                console.error("[-] Error loading stock list:", err);
+            }
+        }
+        loadStocksList();
+
+        // Autocomplete controller
+        const tickerInput = document.getElementById("tickerInput");
+        const autocompleteDropdown = document.getElementById("autocompleteDropdown");
+
+        tickerInput.addEventListener("input", function() {
+            const query = this.value.trim().toUpperCase();
+            activeSuggestionIndex = -1;
+            
+            if (!query) {
+                hideDropdown();
+                return;
+            }
+
+            // Filter rules:
+            // 1. Matches starting with query symbol (highest priority)
+            // 2. Matches containing query symbol
+            // 3. Matches containing company name
+            const startsWithQuery = [];
+            const containsQuerySymbol = [];
+            const containsQueryName = [];
+
+            for (const stock of nseStocksList) {
+                const symbol = stock.symbol;
+                const name = stock.name.toUpperCase();
+                
+                if (symbol.startsWith(query)) {
+                    startsWithQuery.push(stock);
+                } else if (symbol.includes(query)) {
+                    containsQuerySymbol.push(stock);
+                } else if (name.includes(query)) {
+                    containsQueryName.push(stock);
+                }
+            }
+
+            // Combine and limit to 10 results
+            const filtered = [...startsWithQuery, ...containsQuerySymbol, ...containsQueryName].slice(0, 10);
+            
+            if (filtered.length > 0) {
+                renderDropdown(filtered);
+            } else {
+                hideDropdown();
+            }
+        });
+
+        function renderDropdown(items) {
+            autocompleteDropdown.innerHTML = "";
+            autocompleteDropdown.style.display = "block";
+
+            items.forEach((item, index) => {
+                const div = document.createElement("div");
+                div.className = "autocomplete-item";
+                div.dataset.symbol = item.symbol;
+                div.dataset.index = index;
+                
+                div.innerHTML = `
+                    <span class="symbol-badge">${item.symbol}</span>
+                    <span class="company-name" title="${item.name}">${item.name}</span>
+                `;
+                
+                div.addEventListener("click", function() {
+                    selectItem(item.symbol);
+                });
+                
+                autocompleteDropdown.appendChild(div);
+            });
+        }
+
+        function hideDropdown() {
+            autocompleteDropdown.style.display = "none";
+            autocompleteDropdown.innerHTML = "";
+            activeSuggestionIndex = -1;
+        }
+
+        function selectItem(symbol) {
+            tickerInput.value = symbol;
+            hideDropdown();
+            handleSearch();
+        }
+
+        // Keyboard navigation & dismissal
+        tickerInput.addEventListener("keydown", function(e) {
+            const items = autocompleteDropdown.querySelectorAll(".autocomplete-item");
+            if (autocompleteDropdown.style.display !== "block" || items.length === 0) {
+                return;
+            }
+
+            if (e.key === "ArrowDown") {
+                e.preventDefault();
+                activeSuggestionIndex++;
+                if (activeSuggestionIndex >= items.length) activeSuggestionIndex = 0;
+                highlightItem(items);
+            } else if (e.key === "ArrowUp") {
+                e.preventDefault();
+                activeSuggestionIndex--;
+                if (activeSuggestionIndex < 0) activeSuggestionIndex = items.length - 1;
+                highlightItem(items);
+            } else if (e.key === "Enter") {
+                if (activeSuggestionIndex > -1 && activeSuggestionIndex < items.length) {
+                    e.preventDefault();
+                    selectItem(items[activeSuggestionIndex].dataset.symbol);
+                }
+            } else if (e.key === "Escape") {
+                hideDropdown();
+            }
+        });
+
+        function highlightItem(items) {
+            items.forEach((item, idx) => {
+                if (idx === activeSuggestionIndex) {
+                    item.classList.add("active");
+                    // Scroll item into view if needed
+                    item.scrollIntoView({ block: "nearest" });
+                } else {
+                    item.classList.remove("active");
+                }
+            });
+        }
+
+        // Close dropdown when clicking outside search area
+        document.addEventListener("click", function(e) {
+            const searchContainer = document.querySelector(".search-container");
+            if (searchContainer && !searchContainer.contains(e.target)) {
+                hideDropdown();
+            }
+        });
 
         // Switch Tabs
         function switchTab(evt, tabId) {
