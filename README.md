@@ -24,6 +24,9 @@ This project contains Python scripts to acquire stock prices, company fundamenta
 - `app.py`: Sets up a **FastAPI** web server serving status, predictions, news sentiment, and MPT allocations.
 - `main.py`: Interactive CLI console menu to run specific modules or the end-to-end pipeline runner.
 - `verify_pipeline.py`: Helper script to automatically test and verify the entire pipeline end-to-end.
+- `mobile_clients/`: Directory containing frontend mobile templates:
+  - [flutter_client.dart](file:///c:/Users/DELL/OneDrive/Desktop/ts%20project/stock market/stock-market/mobile_clients/flutter_client.dart): Flutter Widget linking with FastAPI.
+  - [react_native_client.js](file:///c:/Users/DELL/OneDrive/Desktop/ts%20project/stock market/stock-market/mobile_clients/react_native_client.js): React Native Component linking with FastAPI.
 - `data/`: Folder containing the saved CSV data.
 - `models/`: Folder containing trained and saved model weights.
 - `plots/`: Folder containing charts and plots.
@@ -76,3 +79,18 @@ Open **[http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)** to test the AP
 - `GET /predict/{ticker}`: Feeds latest indicators into the trained model to return recommendation: `BUY` or `SELL/HOLD` with confidence score.
 - `GET /sentiment/{ticker}`: Real-time news headlines sentiment positive/negative summary.
 - `POST /portfolio/optimize`: Computes optimal portfolio weights.
+
+---
+
+## 📱 Mobile App Client Integrations (मोबाइल ऐप एकीकरण)
+
+We provide starter UI widgets to connect mobile clients directly to the Python AI server backend:
+
+1. **Flutter Integration**:
+   - Location: [flutter_client.dart](file:///c:/Users/DELL/OneDrive/Desktop/ts%20project/stock market/stock-market/mobile_clients/flutter_client.dart)
+   - Uses `http` package to call the endpoints and displays a premium dark-themed card containing the prediction action (BUY/SELL/HOLD) and confidence score bar.
+
+2. **React Native Integration**:
+   - Location: [react_native_client.js](file:///c:/Users/DELL/OneDrive/Desktop/ts%20project/stock market/stock-market/mobile_clients/react_native_client.js)
+   - Uses React functional components, `fetch` API, and modern custom stylesheet styling for glassmorphic cards rendering predictions and news headlines sentiment summaries.
+
