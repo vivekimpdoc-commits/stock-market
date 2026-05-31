@@ -85,12 +85,14 @@ def calculate_technical_indicators(input_filepath: str, save_dir: str = "data") 
         df['OBV'] = obv
         
         # Save output
-        os.makedirs(save_dir, exist_ok=True)
         filename = os.path.basename(input_filepath)
-        output_filename = filename.replace("_prices.csv", "_indicators.csv")
+        output_filename = filename.replace("_daily_prices.csv", "_indicators.csv")
+        if output_filename == filename:
+            output_filename = filename.replace("_prices.csv", "_indicators.csv")
         if output_filename == filename:
             output_filename = "indicators_" + filename
             
+        os.makedirs(save_dir, exist_ok=True)
         output_filepath = os.path.join(save_dir, output_filename)
         df.to_csv(output_filepath, index=False)
         logging.info(f"Successfully calculated indicators. Saved to {output_filepath} ({len(df)} rows, {len(df.columns)} columns).")

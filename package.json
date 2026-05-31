@@ -5,7 +5,9 @@
   "main": "app.py",
   "scripts": {
     "start": "node start_server.js",
-    "install-py": "C:\\Users\\DELL\\AppData\\Local\\Python\\bin\\python.exe -m pip install fastapi uvicorn pandas numpy yfinance scikit-learn xgboost vaderSentiment requests beautifulsoup4 scipy matplotlib"
+    "install-py": "C:\\Users\\DELL\\AppData\\Local\\Python\\bin\\python.exe -m pip install fastapi uvicorn pandas numpy yfinance scikit-learn xgboost vaderSentiment requests beautifulsoup4 scipy matplotlib",
+    "run-pipeline": "C:\\Users\\DELL\\AppData\\Local\\Python\\bin\\python.exe run_pipeline.py RELIANCE",
+    "run-pipeline-tcs": "C:\\Users\\DELL\\AppData\\Local\\Python\\bin\\python.exe run_pipeline.py TCS"
   },
   "dependencies": {}
 }
