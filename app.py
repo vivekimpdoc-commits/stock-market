@@ -45,6 +45,17 @@ def read_index():
             return HTMLResponse(content=f.read())
     return HTMLResponse(content="<h1>index.html dashboard file not found!</h1>", status_code=404)
 
+@app.get("/login", response_class=HTMLResponse)
+def read_login():
+    """
+    Serves the new login page.
+    """
+    login_path = "login.html"
+    if os.path.exists(login_path):
+        with open(login_path, "r", encoding="utf-8") as f:
+            return HTMLResponse(content=f.read())
+    return HTMLResponse(content="<h1>login.html file not found!</h1>", status_code=404)
+
 @app.get("/status")
 def status():
     """
