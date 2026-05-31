@@ -1,10 +1,14 @@
 import os
+import warnings
 import requests
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, XMLParsedAsHTMLWarning
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, timedelta
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 import logging
+
+# Suppress BeautifulSoup XML-as-HTML warning (we handle both parsers explicitly)
+warnings.filterwarnings("ignore", category=XMLParsedAsHTMLWarning)
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
