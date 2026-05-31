@@ -638,8 +638,10 @@
     </footer>
 
     <script>
-        // API Base URL (FastAPI host)
-        const API_BASE = "http://127.0.0.1:8000";
+        // API Base URL (FastAPI host) - Dynamically switch between local server and host origin
+        const API_BASE = (window.location.protocol === "file:" || window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
+            ? "http://127.0.0.1:8000"
+            : window.location.origin;
         let activeTicker = "";
 
         // Switch Tabs
