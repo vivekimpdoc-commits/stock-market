@@ -8,19 +8,19 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #f0f3f7;
-            --panel-bg: #ffffff;
-            --border-color: #d0d7de;
-            --accent-blue: #0f2e5a; /* NSE Navy */
-            --accent-gold: #f2a818; /* NSE Amber */
-            --text-color: #1e293b;
-            --text-muted: #64748b;
-            --success-color: #0f8b3c; /* NSE Green */
-            --success-bg: #e6f6ec;
-            --danger-color: #d9383a; /* NSE Red */
-            --danger-bg: #fdf2f2;
-            --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-            --border-radius: 4px;
+            --bg-color: #0b1121;
+            --panel-bg: rgba(17, 24, 39, 0.65);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --accent-blue: #3b82f6; 
+            --accent-gold: #f59e0b;
+            --text-color: #f8fafc;
+            --text-muted: #94a3b8;
+            --success-color: #10b981;
+            --success-bg: rgba(16, 185, 129, 0.15);
+            --danger-color: #ef4444;
+            --danger-bg: rgba(239, 68, 68, 0.15);
+            --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --border-radius: 12px;
         }
 
         * {
@@ -32,6 +32,7 @@
         body {
             font-family: 'Outfit', sans-serif;
             background-color: var(--bg-color);
+            background-image: radial-gradient(circle at 50% -20%, #1e3a8a 0%, transparent 40%), radial-gradient(circle at -10% 80%, rgba(245, 158, 11, 0.05) 0%, transparent 30%);
             color: var(--text-color);
             min-height: 100vh;
             display: flex;
@@ -42,9 +43,10 @@
         /* Top Bar */
         .nse-top-bar {
             width: 100%;
-            background-color: #ffffff;
+            background-color: rgba(11, 17, 33, 0.8);
+            backdrop-filter: blur(10px);
             border-bottom: 1px solid var(--border-color);
-            padding: 6px 40px;
+            padding: 8px 40px;
             font-size: 13px;
         }
 
@@ -65,7 +67,7 @@
         }
 
         .index-item {
-            color: #334155;
+            color: #cbd5e1;
         }
 
         .market-status {
@@ -74,6 +76,7 @@
             gap: 6px;
             font-size: 12px;
             color: var(--success-color);
+            font-weight: 700;
         }
 
         .status-dot {
@@ -95,12 +98,14 @@
         /* Main Header */
         header {
             width: 100%;
-            padding: 15px 40px;
+            padding: 20px 40px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: #ffffff;
-            border-bottom: 3px solid var(--accent-gold);
+            background: rgba(17, 24, 39, 0.7);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 4px 30px rgba(0,0,0,0.1);
             z-index: 10;
         }
 
@@ -149,19 +154,19 @@
         .search-container {
             display: flex;
             align-items: center;
-            background: #f1f5f9;
+            background: rgba(255, 255, 255, 0.05);
             border: 1px solid var(--border-color);
-            border-radius: 4px;
-            padding: 4px 4px 4px 12px;
-            width: 360px;
-            transition: all 0.2s ease;
+            border-radius: 8px;
+            padding: 4px 4px 4px 16px;
+            width: 400px;
+            transition: all 0.3s ease;
             position: relative; /* Anchors the autocomplete dropdown */
         }
 
         .search-container:focus-within {
             border-color: var(--accent-blue);
-            box-shadow: 0 0 0 3px rgba(15, 46, 90, 0.15);
-            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+            background: rgba(255, 255, 255, 0.08);
         }
 
         .search-container input {
@@ -174,44 +179,51 @@
             font-family: inherit;
         }
 
+        .search-container input::placeholder {
+            color: #64748b;
+        }
+
         .search-container button {
-            background: var(--accent-blue);
+            background: linear-gradient(135deg, var(--accent-blue) 0%, #2563eb 100%);
             border: none;
             outline: none;
             color: white;
-            padding: 8px 18px;
-            border-radius: 2px;
+            padding: 10px 22px;
+            border-radius: 6px;
             font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.2s ease;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
         }
 
         .search-container button:hover {
-            background-color: #1a4175;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
         }
 
-        /* Autocomplete dropdown styles matching premium light NSE theme */
+        /* Autocomplete dropdown */
         .autocomplete-dropdown {
             position: absolute;
             top: 100%;
             left: 0;
             right: 0;
-            background-color: #ffffff;
+            background-color: #1e293b;
             border: 1px solid var(--border-color);
             border-top: none;
-            border-radius: 0 0 4px 4px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             max-height: 280px;
             overflow-y: auto;
             z-index: 1000;
             display: none;
+            margin-top: 8px;
         }
 
         .autocomplete-item {
-            padding: 10px 14px;
+            padding: 12px 16px;
             cursor: pointer;
             font-size: 14px;
-            border-bottom: 1px solid #f1f5f9;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -225,10 +237,10 @@
 
         .autocomplete-item .symbol-badge {
             font-weight: 700;
-            color: var(--accent-blue);
-            background: #f1f5f9;
-            padding: 2px 6px;
-            border-radius: 3px;
+            color: #60a5fa;
+            background: rgba(59, 130, 246, 0.1);
+            padding: 4px 8px;
+            border-radius: 4px;
             font-size: 12px;
             transition: all 0.15s ease;
         }
@@ -245,12 +257,12 @@
         }
 
         .autocomplete-item:hover, .autocomplete-item.active {
-            background-color: #f1f5f9;
+            background-color: rgba(255, 255, 255, 0.05);
         }
 
         .autocomplete-item.active .symbol-badge {
             background: var(--accent-gold);
-            color: var(--accent-blue);
+            color: #000;
         }
 
         main {
@@ -264,82 +276,79 @@
             gap: 25px;
         }
 
-        /* Navigation Bar matching NSE */
+        /* Navigation Bar */
         .navigation-tabs {
             display: flex;
-            background-color: var(--accent-blue);
-            border-radius: 4px;
-            padding: 0 10px;
+            background-color: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 5px;
             overflow-x: auto;
             box-shadow: var(--card-shadow);
+            gap: 5px;
         }
 
         .tab-btn {
             background: transparent;
             border: none;
-            color: #e2e8f0;
+            color: var(--text-muted);
             font-size: 15px;
             font-weight: 600;
-            padding: 16px 24px;
+            padding: 14px 28px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
             position: relative;
             white-space: nowrap;
+            border-radius: 8px;
         }
 
         .tab-btn:hover {
-            color: #ffffff;
+            color: var(--text-color);
             background: rgba(255, 255, 255, 0.05);
         }
 
         .tab-btn.active {
             color: #ffffff;
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .tab-btn.active::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background-color: var(--accent-gold);
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(37, 99, 235, 0.1) 100%);
+            box-shadow: inset 0 0 0 1px rgba(59, 130, 246, 0.3);
         }
 
         .tab-content {
             display: none;
-            animation: fadeIn 0.3s ease forwards;
+            animation: fadeIn 0.4s ease forwards;
         }
 
         .tab-content.active {
             display: block;
         }
 
-        /* Official looking Card panels */
+        /* Glass Panel */
         .glass-panel {
             background: var(--panel-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border: 1px solid var(--border-color);
             border-radius: var(--border-radius);
-            padding: 25px;
+            padding: 30px;
             box-shadow: var(--card-shadow);
         }
 
         /* Home/Search instruction styles */
         .welcome-panel {
             text-align: center;
-            padding: 50px 30px;
+            padding: 60px 30px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 15px;
+            gap: 20px;
             border-top: 4px solid var(--accent-blue);
         }
 
         .welcome-panel h2 {
-            font-size: 30px;
-            font-weight: 700;
-            color: var(--accent-blue);
+            font-size: 34px;
+            font-weight: 800;
+            color: var(--text-color);
         }
 
         .welcome-panel p {
@@ -362,16 +371,16 @@
             }
         }
 
-        /* Card Headers resembling NSE table style */
+        /* Card Headers */
         .glass-panel h3 {
             font-size: 18px;
-            color: var(--accent-blue);
+            color: var(--text-color);
             font-weight: 700;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #edf2f7;
+            margin-bottom: 25px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
         }
 
         .recommendation-card {
@@ -380,26 +389,52 @@
             align-items: center;
             justify-content: center;
             text-align: center;
-            padding: 30px;
+            padding: 40px 30px;
             border-radius: var(--border-radius);
             transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .recommendation-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            opacity: 0.1;
+            z-index: 0;
         }
 
         .recommendation-card.buy-mode {
             background-color: var(--success-bg);
-            border: 1px solid rgba(15, 139, 60, 0.25);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            box-shadow: 0 0 40px rgba(16, 185, 129, 0.1);
+        }
+
+        .recommendation-card.buy-mode::before {
+            background: radial-gradient(circle, var(--success-color) 0%, transparent 70%);
         }
 
         .recommendation-card.sell-mode {
             background-color: var(--danger-bg);
-            border: 1px solid rgba(217, 56, 58, 0.25);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            box-shadow: 0 0 40px rgba(239, 68, 68, 0.1);
+        }
+
+        .recommendation-card.sell-mode::before {
+            background: radial-gradient(circle, var(--danger-color) 0%, transparent 70%);
+        }
+
+        .recommendation-card > * {
+            position: relative;
+            z-index: 1;
         }
 
         .recommendation-badge {
-            font-size: 42px;
+            font-size: 48px;
             font-weight: 900;
-            margin: 10px 0;
-            letter-spacing: 1px;
+            margin: 15px 0;
+            letter-spacing: 2px;
+            text-shadow: 0 0 20px rgba(255,255,255,0.1);
         }
 
         .buy-mode .recommendation-badge {
@@ -413,67 +448,64 @@
         .confidence-container {
             width: 100%;
             max-width: 320px;
-            margin: 15px 0;
-            background: #e2e8f0;
-            border-radius: 2px;
-            height: 22px;
+            margin: 20px 0;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            height: 14px;
             overflow: hidden;
-            border: 1px solid #cbd5e1;
+            border: 1px solid rgba(255,255,255,0.05);
             position: relative;
         }
 
         .confidence-bar {
             height: 100%;
-            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 10px;
         }
 
         .buy-mode .confidence-bar {
-            background-color: var(--success-color);
+            background: linear-gradient(90deg, #059669 0%, #34d399 100%);
+            box-shadow: 0 0 10px #34d399;
         }
 
         .sell-mode .confidence-bar {
-            background-color: var(--danger-color);
+            background: linear-gradient(90deg, #dc2626 0%, #f87171 100%);
+            box-shadow: 0 0 10px #f87171;
         }
 
         .confidence-label {
-            position: absolute;
-            font-size: 11px;
-            font-weight: 700;
-            color: #1e293b;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            display: none;
         }
 
         .info-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 5px;
+            margin-top: 10px;
         }
 
         .info-table tr {
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
         }
 
         .info-table tr:hover {
-            background-color: #f8fafc;
+            background-color: rgba(255,255,255,0.02);
         }
 
         .info-table td {
-            padding: 14px 10px;
+            padding: 16px 12px;
             font-size: 15px;
-            color: #334155;
+            color: #cbd5e1;
         }
 
         .info-table td:first-child {
             color: var(--text-muted);
-            font-weight: 600;
+            font-weight: 500;
         }
 
         .info-table td:last-child {
             text-align: right;
             font-weight: 700;
-            color: var(--accent-blue);
+            color: var(--text-color);
         }
 
         /* Sentiment Tab Styles */
@@ -481,45 +513,51 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 25px;
-            border-bottom: 2px solid #edf2f7;
-            padding-bottom: 15px;
+            margin-bottom: 30px;
+            background: rgba(0,0,0,0.15);
+            border: 1px solid rgba(255,255,255,0.03);
+            border-radius: 12px;
+            padding: 25px;
         }
 
         .sentiment-score-gauge {
-            font-size: 44px;
+            font-size: 48px;
             font-weight: 900;
-            color: var(--accent-blue);
+            color: var(--text-color);
+            background: none !important;
+            -webkit-text-fill-color: var(--text-color);
+            text-shadow: 0 0 20px rgba(255,255,255,0.1);
         }
 
         .headline-card {
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
+            background: rgba(30, 41, 59, 0.4);
+            border: 1px solid rgba(255,255,255,0.05);
             border-left: 4px solid var(--accent-blue);
-            border-radius: var(--border-radius);
-            padding: 16px;
-            margin-bottom: 12px;
-            transition: all 0.2s ease;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.01);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
         }
 
         .headline-card:hover {
+            background: rgba(30, 41, 59, 0.7);
             border-left-color: var(--accent-gold);
-            transform: translateX(3px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.04);
+            transform: translateX(4px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
         }
 
         .headline-header {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 6px;
+            margin-bottom: 10px;
             font-size: 12px;
         }
 
         .headline-source {
             font-weight: 700;
-            color: var(--accent-blue);
+            color: #93c5fd;
             text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .headline-date {
@@ -527,106 +565,266 @@
         }
 
         .headline-title {
-            font-size: 15px;
+            font-size: 16px;
             font-weight: 600;
-            color: #1e293b;
-            line-height: 1.4;
-            margin-bottom: 10px;
+            color: var(--text-color);
+            line-height: 1.5;
+            margin-bottom: 15px;
         }
 
         .headline-score-badge {
             display: inline-block;
-            padding: 3px 8px;
-            border-radius: 2px;
+            padding: 4px 10px;
+            border-radius: 4px;
             font-size: 11px;
-            font-weight: 700;
+            font-weight: 800;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .headline-score-badge.positive {
             background-color: var(--success-bg);
             color: var(--success-color);
+            border: 1px solid rgba(16, 185, 129, 0.2);
         }
 
         .headline-score-badge.negative {
             background-color: var(--danger-bg);
             color: var(--danger-color);
+            border: 1px solid rgba(239, 68, 68, 0.2);
         }
 
         .headline-score-badge.neutral {
-            background-color: #f1f5f9;
+            background-color: rgba(255,255,255,0.05);
             color: var(--text-muted);
+            border: 1px solid rgba(255,255,255,0.05);
         }
 
         /* Portfolio Optimization Styles */
-        .portfolio-form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-bottom: 30px;
-            background-color: #f8fafc;
-            padding: 20px;
+        .mpt-header-container {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, #1e4b85 100%);
+            color: white;
+            padding: 25px;
             border-radius: var(--border-radius);
-            border: 1px solid #e2e8f0;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(15, 46, 90, 0.15);
+            position: relative;
+            overflow: hidden;
         }
 
+        .mpt-header-container::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(242, 168, 24, 0.15) 0%, rgba(255,255,255,0) 70%);
+            border-radius: 50%;
+        }
+
+        .mpt-header-container h3 {
+            color: #ffffff !important;
+            border-bottom: none !important;
+            padding-bottom: 0 !important;
+            font-size: 24px !important;
+            margin-bottom: 8px !important;
+        }
+
+        .mpt-header-container p {
+            color: rgba(255, 255, 255, 0.8) !important;
+            margin-bottom: 0 !important;
+            max-width: 800px;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .mpt-input-area {
+            background: rgba(0,0,0,0.15);
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 25px;
+            border-radius: var(--border-radius);
+            margin-bottom: 30px;
+        }
+        
+        /* Form group for inputs */
         .form-group {
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 8px;
         }
 
         .form-group label {
-            font-weight: 700;
-            font-size: 13px;
-            color: var(--accent-blue);
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-muted);
             text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .form-group input {
-            background: #ffffff;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            padding: 10px 12px;
-            color: var(--text-color);
-            font-size: 15px;
-            outline: none;
-            font-family: inherit;
-            transition: all 0.2s ease;
+            background: rgba(15, 23, 42, 0.6) !important;
+            border: 1px solid rgba(255,255,255,0.1) !important;
+            border-radius: 8px !important;
+            padding: 14px 16px !important;
+            color: var(--text-color) !important;
+            font-size: 16px !important;
+            outline: none !important;
+            font-family: inherit !important;
+            transition: all 0.3s ease !important;
         }
 
         .form-group input:focus {
-            border-color: var(--accent-blue);
-            box-shadow: 0 0 0 3px rgba(15, 46, 90, 0.1);
+            border-color: var(--accent-blue) !important;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2) !important;
         }
 
-        .portfolio-results-grid {
+        .mpt-btn {
+            background: linear-gradient(90deg, var(--accent-gold) 0%, #f59e0b 100%);
+            border: none;
+            outline: none;
+            color: #ffffff;
+            padding: 14px 35px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(242, 168, 24, 0.3);
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .mpt-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(242, 168, 24, 0.4);
+        }
+
+        .mpt-results-wrapper {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 25px;
         }
 
         @media (max-width: 800px) {
-            .portfolio-results-grid {
+            .mpt-results-wrapper {
                 grid-template-columns: 1fr;
             }
         }
 
-        .portfolio-card h3 {
-            font-size: 16px;
-            margin-bottom: 15px;
-            color: var(--accent-blue);
-            border-bottom: 2px solid #edf2f7;
-            padding-bottom: 8px;
+        .mpt-result-card {
+            background: rgba(30, 41, 59, 0.4);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
         }
 
-        .portfolio-card .stat {
-            font-size: 24px;
+        .mpt-result-card:hover {
+            border-color: var(--accent-blue);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+            transform: translateY(-3px);
+        }
+
+        .mpt-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding-bottom: 15px;
+        }
+
+        .mpt-card-title {
+            font-size: 18px;
             font-weight: 800;
+            color: var(--accent-blue);
+            text-transform: uppercase;
+        }
+
+        .mpt-card-subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .mpt-stat-highlight {
+            font-size: 32px;
+            font-weight: 900;
             color: var(--success-color);
-            background: none;
-            -webkit-background-clip: initial;
-            -webkit-text-fill-color: initial;
+            line-height: 1;
+        }
+
+        .mpt-stat-highlight.volatility {
+            color: var(--accent-gold);
+        }
+
+        .allocation-bar-container {
+            margin-top: 15px;
+        }
+
+        .allocation-item {
+            margin-bottom: 12px;
+        }
+
+        .allocation-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            font-weight: 600;
+            color: #cbd5e1;
+            margin-bottom: 5px;
+        }
+
+        .allocation-bar-bg {
+            height: 8px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .allocation-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-blue) 0%, #3b82f6 100%);
+            border-radius: 4px;
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .allocation-bar-fill.alt-color {
+            background: linear-gradient(90deg, var(--success-color) 0%, #34d399 100%);
+        }
+        
+        .mpt-metrics-row {
+            display: flex;
+            justify-content: space-between;
+            background: rgba(0,0,0,0.15);
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .mpt-metric {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .mpt-metric-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+        
+        .mpt-metric-value {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--text-color);
         }
 
         /* Loading spinner */
@@ -642,7 +840,7 @@
         .spinner {
             width: 40px;
             height: 40px;
-            border: 4px solid #e2e8f0;
+            border: 4px solid rgba(255,255,255,0.1);
             border-top-color: var(--accent-blue);
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
@@ -664,7 +862,8 @@
             color: var(--text-muted);
             font-size: 13px;
             border-top: 1px solid var(--border-color);
-            background-color: #ffffff;
+            background-color: rgba(11, 17, 33, 0.8);
+            backdrop-filter: blur(10px);
             margin-top: auto;
         }
     </style>
@@ -784,35 +983,62 @@
 
         <!-- Portfolio Optimization Tab Content -->
         <div id="portfolio-tab" class="tab-content glass-panel">
-            <h3 style="font-size: 22px; margin-bottom: 10px;">Modern Portfolio Theory (MPT) Optimization</h3>
-            <p style="color: var(--text-muted); margin-bottom: 30px;">Input multiple stock symbols to calculate the mathematically optimal allocation ratio maximizing returns relative to risk.</p>
+            <div class="mpt-header-container">
+                <h3>Modern Portfolio Theory (MPT) Optimization</h3>
+                <p>Harness advanced mathematical modeling to discover the optimal asset allocation. Maximize your expected returns for a given level of risk, or minimize risk for expected returns.</p>
+            </div>
             
-            <div class="portfolio-form">
-                <div class="form-group">
-                    <label for="portfolioTickers">Stock Symbols (comma separated)</label>
-                    <input type="text" id="portfolioTickers" placeholder="e.g. RELIANCE, TCS, INFY, HDFCBANK">
+            <div class="mpt-input-area">
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label for="portfolioTickers">Portfolio Stock Symbols (Comma Separated)</label>
+                    <input type="text" id="portfolioTickers" placeholder="e.g. RELIANCE, TCS, INFY, HDFCBANK" style="padding: 14px 16px; font-size: 16px; border: 2px solid #e2e8f0; border-radius: 8px;">
                 </div>
                 <div style="text-align: right;">
-                    <button onclick="runPortfolioOptimization()" style="background: var(--primary-glow); border: none; outline: none; color: white; padding: 12px 30px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: opacity 0.2s ease;">Optimize Allocation</button>
+                    <button onclick="runPortfolioOptimization()" class="mpt-btn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                        Optimize Portfolio Allocation
+                    </button>
                 </div>
             </div>
 
             <!-- Portfolio Results -->
-            <div id="portfolioResults" style="display: none;" class="portfolio-results-grid">
-                <div class="glass-panel portfolio-card" style="background: rgba(255,255,255,0.01)">
-                    <h3>Max Sharpe Ratio <span class="stat" id="mptSharpeReturn">18.5%</span></h3>
-                    <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">Maximum returns per unit of volatility risk.</p>
-                    <table class="info-table" id="maxSharpeTable">
-                        <!-- Filled dynamically -->
-                    </table>
+            <div id="portfolioResults" style="display: none;" class="mpt-results-wrapper">
+                <div class="mpt-result-card">
+                    <div class="mpt-card-header">
+                        <div>
+                            <div class="mpt-card-title">Max Sharpe Ratio</div>
+                            <div class="mpt-card-subtitle">Optimal risk-adjusted returns</div>
+                        </div>
+                        <div class="mpt-stat-highlight" id="mptSharpeReturn">0.0%</div>
+                    </div>
+                    
+                    <div class="mpt-metrics-row" id="maxSharpeMetrics">
+                        <!-- Metrics injected here -->
+                    </div>
+                    
+                    <h4 style="font-size: 13px; color: var(--accent-blue); text-transform: uppercase; margin-bottom: 15px; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px;">Recommended Allocation</h4>
+                    <div id="maxSharpeAllocation" class="allocation-bar-container">
+                        <!-- Bars injected here -->
+                    </div>
                 </div>
 
-                <div class="glass-panel portfolio-card" style="background: rgba(255,255,255,0.01)">
-                    <h3>Min Volatility <span class="stat" id="mptMinVolReturn">12.2%</span></h3>
-                    <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">Lowest possible portfolio volatility risk.</p>
-                    <table class="info-table" id="minVolTable">
-                        <!-- Filled dynamically -->
-                    </table>
+                <div class="mpt-result-card">
+                    <div class="mpt-card-header">
+                        <div>
+                            <div class="mpt-card-title">Minimum Volatility</div>
+                            <div class="mpt-card-subtitle">Safest possible portfolio</div>
+                        </div>
+                        <div class="mpt-stat-highlight volatility" id="mptMinVolReturn">0.0%</div>
+                    </div>
+                    
+                    <div class="mpt-metrics-row" id="minVolMetrics">
+                        <!-- Metrics injected here -->
+                    </div>
+                    
+                    <h4 style="font-size: 13px; color: var(--accent-blue); text-transform: uppercase; margin-bottom: 15px; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px;">Recommended Allocation</h4>
+                    <div id="minVolAllocation" class="allocation-bar-container">
+                        <!-- Bars injected here -->
+                    </div>
                 </div>
             </div>
         </div>
@@ -1164,30 +1390,62 @@
                 // Show result grid
                 document.getElementById("portfolioResults").style.display = "grid";
                 
-                // Max Sharpe return / vol / weights
+                // Max Sharpe logic
                 document.getElementById("mptSharpeReturn").innerText = (data.max_sharpe_ratio_portfolio.expected_return * 100).toFixed(1) + "%";
-                const maxTable = document.getElementById("maxSharpeTable");
-                maxTable.innerHTML = `
-                    <tr><td>Expected Ann. Return</td><td>${(data.max_sharpe_ratio_portfolio.expected_return * 100).toFixed(2)}%</td></tr>
-                    <tr><td>Portfolio Volatility (Risk)</td><td>${(data.max_sharpe_ratio_portfolio.expected_volatility * 100).toFixed(2)}%</td></tr>
-                    <tr><td>Sharpe Ratio</td><td>${data.max_sharpe_ratio_portfolio.sharpe_ratio.toFixed(4)}</td></tr>
-                    <tr style="border-bottom: 2px solid var(--accent-purple); font-weight:700;"><td colspan="2" style="padding-top:20px;">Asset Allocation Weight</td></tr>
+                
+                document.getElementById("maxSharpeMetrics").innerHTML = `
+                    <div class="mpt-metric">
+                        <span class="mpt-metric-label">Volatility</span>
+                        <span class="mpt-metric-value">${(data.max_sharpe_ratio_portfolio.expected_volatility * 100).toFixed(2)}%</span>
+                    </div>
+                    <div class="mpt-metric">
+                        <span class="mpt-metric-label">Sharpe Ratio</span>
+                        <span class="mpt-metric-value">${data.max_sharpe_ratio_portfolio.sharpe_ratio.toFixed(2)}</span>
+                    </div>
                 `;
-                for (const [stock, weight] of Object.entries(data.max_sharpe_ratio_portfolio.weights)) {
-                    maxTable.innerHTML += `<tr><td>${stock}</td><td>${(weight * 100).toFixed(2)}%</td></tr>`;
+                
+                const maxAllocContainer = document.getElementById("maxSharpeAllocation");
+                maxAllocContainer.innerHTML = "";
+                let maxWeights = Object.entries(data.max_sharpe_ratio_portfolio.weights).sort((a,b) => b[1] - a[1]);
+                for (const [stock, weight] of maxWeights) {
+                    if (weight > 0.005) { // Show only > 0.5%
+                        const pct = (weight * 100).toFixed(1);
+                        maxAllocContainer.innerHTML += `
+                            <div class="allocation-item">
+                                <div class="allocation-info"><span>${stock}</span><span>${pct}%</span></div>
+                                <div class="allocation-bar-bg"><div class="allocation-bar-fill" style="width: ${pct}%;"></div></div>
+                            </div>
+                        `;
+                    }
                 }
                 
-                // Min Vol return / vol / weights
+                // Min Vol logic
                 document.getElementById("mptMinVolReturn").innerText = (data.minimum_volatility_portfolio.expected_return * 100).toFixed(1) + "%";
-                const minTable = document.getElementById("minVolTable");
-                minTable.innerHTML = `
-                    <tr><td>Expected Ann. Return</td><td>${(data.minimum_volatility_portfolio.expected_return * 100).toFixed(2)}%</td></tr>
-                    <tr><td>Portfolio Volatility (Risk)</td><td>${(data.minimum_volatility_portfolio.expected_volatility * 100).toFixed(2)}%</td></tr>
-                    <tr><td>Sharpe Ratio</td><td>${data.minimum_volatility_portfolio.sharpe_ratio.toFixed(4)}</td></tr>
-                    <tr style="border-bottom: 2px solid var(--accent-blue); font-weight:700;"><td colspan="2" style="padding-top:20px;">Asset Allocation Weight</td></tr>
+                
+                document.getElementById("minVolMetrics").innerHTML = `
+                    <div class="mpt-metric">
+                        <span class="mpt-metric-label">Volatility</span>
+                        <span class="mpt-metric-value" style="color:var(--accent-gold);">${(data.minimum_volatility_portfolio.expected_volatility * 100).toFixed(2)}%</span>
+                    </div>
+                    <div class="mpt-metric">
+                        <span class="mpt-metric-label">Sharpe Ratio</span>
+                        <span class="mpt-metric-value">${data.minimum_volatility_portfolio.sharpe_ratio.toFixed(2)}</span>
+                    </div>
                 `;
-                for (const [stock, weight] of Object.entries(data.minimum_volatility_portfolio.weights)) {
-                    minTable.innerHTML += `<tr><td>${stock}</td><td>${(weight * 100).toFixed(2)}%</td></tr>`;
+                
+                const minAllocContainer = document.getElementById("minVolAllocation");
+                minAllocContainer.innerHTML = "";
+                let minWeights = Object.entries(data.minimum_volatility_portfolio.weights).sort((a,b) => b[1] - a[1]);
+                for (const [stock, weight] of minWeights) {
+                    if (weight > 0.005) { // Show only > 0.5%
+                        const pct = (weight * 100).toFixed(1);
+                        minAllocContainer.innerHTML += `
+                            <div class="allocation-item">
+                                <div class="allocation-info"><span>${stock}</span><span>${pct}%</span></div>
+                                <div class="allocation-bar-bg"><div class="allocation-bar-fill alt-color" style="width: ${pct}%;"></div></div>
+                            </div>
+                        `;
+                    }
                 }
                 
                 document.getElementById("globalLoader").style.display = "none";

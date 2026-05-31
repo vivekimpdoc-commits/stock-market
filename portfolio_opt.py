@@ -1,6 +1,8 @@
 import os
 import pandas as pd
 import numpy as np
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import logging
 from fetch_prices import fetch_historical_daily, clean_ticker_name
