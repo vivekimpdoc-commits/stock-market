@@ -1,0 +1,10 @@
+{
+  "name": "stock-market-ai",
+  "version": "1.0.0",
+  "description": "Stock Market AI Web API and Dashboard",
+  "main": "app.py",
+  "scripts": {
+    "start": "node start_server.js"
+  },
+  "dependencies": {}
+}

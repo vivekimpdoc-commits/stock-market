@@ -49,8 +49,14 @@ def fetch_financial_sheets(ticker: str, save_dir: str = "data") -> dict:
                 df_transposed = df.transpose()
                 df_transposed = df_transposed.reset_index().rename(columns={'index': 'Date'})
                 
-                # Format date to YYYY-MM-DD
-                df_transposed['Date'] = pd.to_datetime(df_transposed['Date']).dt.tz_localize(None).dt.strftime('%Y-%m-%d')
+                # Format date to YYYY-MM-DD safely
+                dates_converted = pd.to_datetime(df_transposed['Date'])
+                try:
+                    if dates_converted.dt.tz is not None:
+                        dates_converted = dates_converted.dt.tz_localize(None)
+                except AttributeError:
+                    pass
+                df_transposed['Date'] = dates_converted.dt.strftime('%Y-%m-%d')
                 
                 file_path = os.path.join(save_dir, f"{clean_name}_{sheet_name}.csv")
                 df_transposed.to_csv(file_path, index=False)

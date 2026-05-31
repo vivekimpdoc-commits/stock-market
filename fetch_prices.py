@@ -41,10 +41,16 @@ def fetch_historical_daily(ticker: str, start_date: str = "2011-01-01", end_date
             logging.warning(f"No historical daily data found for {ticker} in the specified range.")
             return None
             
-        # Reset index to make Date a column and localize/remove timezone for cleaner CSV format
+        # Reset index to make Date a column and localize/remove timezone safely
         df = df.reset_index()
         if 'Date' in df.columns:
-            df['Date'] = pd.to_datetime(df['Date']).dt.tz_localize(None)
+            dates_converted = pd.to_datetime(df['Date'])
+            try:
+                if dates_converted.dt.tz is not None:
+                    dates_converted = dates_converted.dt.tz_localize(None)
+            except AttributeError:
+                pass
+            df['Date'] = dates_converted
             
         # Ensure target directory exists
         os.makedirs(save_dir, exist_ok=True)
@@ -86,12 +92,18 @@ def fetch_intraday(ticker: str, interval: str = "5m", period: str = "5d", save_d
             logging.warning(f"No intraday data found for {ticker} with interval={interval} and period={period}.")
             return None
             
-        # Format datetime column
+        # Format datetime column safely
         df = df.reset_index()
         # yfinance returns 'Datetime' for intraday data
         date_col = 'Datetime' if 'Datetime' in df.columns else 'Date'
         if date_col in df.columns:
-            df[date_col] = pd.to_datetime(df[date_col]).dt.tz_localize(None)
+            dates_converted = pd.to_datetime(df[date_col])
+            try:
+                if dates_converted.dt.tz is not None:
+                    dates_converted = dates_converted.dt.tz_localize(None)
+            except AttributeError:
+                pass
+            df[date_col] = dates_converted
             
         # Ensure target directory exists
         os.makedirs(save_dir, exist_ok=True)
