@@ -1,0 +1,12 @@
+Metric,Value
+Ticker,TCS
+Initial_Capital,100000.0
+AI_Final_Value,92979.50031811529
+Benchmark_Final_Value,77676.92755639649
+AI_Total_Return,-0.07020499681884713
+Benchmark_Total_Return,-0.2232307244360351
+Annualized_Sharpe_Ratio,-0.55544207926531
+Max_Drawdown,-0.2708054275462845
+Total_Trades,156
+Completed_Trades,78
+Win_Rate,0.48717948717948717

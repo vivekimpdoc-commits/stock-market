@@ -22,7 +22,7 @@ def verify():
         from portfolio_opt import optimize_portfolio
         from backtest import run_backtest
         from app import app
-        print("[✓] All modules, including FastAPI app.py, imported successfully!")
+        print("[OK] All modules, including FastAPI app.py, imported successfully!")
     except ImportError as e:
         print(f"[X] Import error: {e}")
         print("[!] Make sure you installed the dependencies using: pip install -r requirements.txt")
@@ -53,14 +53,14 @@ def verify():
     if not ml_files:
         print("[X] Failed to prepare machine learning datasets.")
         return
-    print("[✓] Dataset scaling and preparation verified.")
+    print("[OK] Dataset scaling and preparation verified.")
         
     # 3. XGBoost / RandomForest Classifier check
     print(f"\n[3] Testing classification model training (XGBoost/RF)...")
     try:
         success = train_xgboost_model(clean_name)
         if success:
-            print(f"[✓] Classification model trained successfully! Model file and importance plot saved.")
+            print(f"[OK] Classification model trained successfully! Model file and importance plot saved.")
         else:
             print("[X] Classification model training failed.")
             return
@@ -73,7 +73,7 @@ def verify():
     try:
         backtest_metrics = run_backtest(clean_name)
         if backtest_metrics:
-            print(f"[✓] Backtesting successful!")
+            print(f"[OK] Backtesting successful!")
             print(f"   - AI Strategy Return: {backtest_metrics['AI_Total_Return']:.2%}")
             print(f"   - Benchmark Return:   {backtest_metrics['Benchmark_Total_Return']:.2%}")
             print(f"   - Annual Sharpe:      {backtest_metrics['Annualized_Sharpe_Ratio']:.4f}")
@@ -83,7 +83,7 @@ def verify():
             trades_file = os.path.join("data", f"{clean_name}_backtest_trades.csv")
             plot_file = os.path.join("plots", f"{clean_name}_backtest.png")
             if os.path.exists(trades_file) and os.path.exists(plot_file):
-                print(f"[✓] Backtest trades CSV and plot verification passed.")
+                print(f"[OK] Backtest trades CSV and plot verification passed.")
             else:
                 print(f"[X] Missing backtest output files.")
         else:
@@ -97,7 +97,7 @@ def verify():
         # Optimizing small portfolio for speed (Reliance and TCS)
         portfolios = optimize_portfolio(['RELIANCE.NS', 'TCS.NS'], start_date="2024-01-01", num_portfolios=200)
         if portfolios:
-            print(f"[✓] MPT Portfolio optimization verified! Frontier plot and CSV weights saved.")
+            print(f"[OK] MPT Portfolio optimization verified! Frontier plot and CSV weights saved.")
         else:
             print("[X] Portfolio optimization failed.")
     except Exception as e:
@@ -112,7 +112,7 @@ def verify():
     try:
         sent_df = run_finbert_sentiment(news_file)
         if not sent_df.empty:
-            print(f"[✓] News sentiment analysis verified!")
+            print(f"[OK] News sentiment analysis verified!")
         else:
             print("[X] News sentiment analysis failed.")
     except Exception as e:
@@ -122,7 +122,7 @@ def verify():
     print(f"\n[7] Checking LSTM Neural Network Setup...")
     try:
         import tensorflow as tf
-        print(f"[✓] TensorFlow version: {tf.__version__}")
+        print(f"[OK] TensorFlow version: {tf.__version__}")
         print("[*] Skipping LSTM training dry-run (use Option 6 in main.py to train).")
     except ImportError:
         print("[!] TensorFlow not installed. Install tensorflow using 'pip install tensorflow' to train the LSTM.")
@@ -133,11 +133,11 @@ def verify():
         import uvicorn
         from fastapi import FastAPI
         assert isinstance(app, FastAPI)
-        print("[✓] FastAPI server app instance successfully initialized!")
+        print("[OK] FastAPI server app instance successfully initialized!")
         
         # Check if dashboard exists
         if os.path.exists("index.html"):
-            print("[✓] index.html dashboard file found and ready to be served at root URL (/).")
+            print("[OK] index.html dashboard file found and ready to be served at root URL (/).")
         else:
             print("[X] index.html dashboard file is missing.")
             
