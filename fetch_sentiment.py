@@ -35,14 +35,30 @@ def parse_rss_feed(feed_name: str, url: str) -> list:
             logging.error(f"Failed to fetch {feed_name}: HTTP {response.status_code}")
             return []
             
-        soup = BeautifulSoup(response.content, features="xml")
+        try:
+            soup = BeautifulSoup(response.content, features="xml")
+        except Exception:
+            # Fallback to standard html.parser if xml features (like lxml) aren't available
+            soup = BeautifulSoup(response.content, "html.parser")
+            
         items = soup.find_all("item")
         
         for item in items:
             title = item.find("title").text.strip() if item.find("title") else ""
             link = item.find("link").text.strip() if item.find("link") else ""
-            pub_date_str = item.find("pubDate").text.strip() if item.find("pubDate") else ""
+            pub_date_tag = item.find("pubDate") or item.find("pubdate")
+            pub_date_str = pub_date_tag.text.strip() if pub_date_tag else ""
             desc = item.find("description").text.strip() if item.find("description") else ""
+            
+            # Extract source tag if present (common in Google News RSS)
+            source_tag = item.find("source")
+            source_name = source_tag.text.strip() if source_tag else ""
+            
+            # Determine source label
+            if source_name:
+                item_source = f"{feed_name} ({source_name})"
+            else:
+                item_source = feed_name
             
             # Remove HTML tags from description if any
             if desc:
@@ -51,20 +67,38 @@ def parse_rss_feed(feed_name: str, url: str) -> list:
             # Try to parse date
             pub_date = None
             if pub_date_str:
-                for fmt in ('%a, %d %b %Y %H:%M:%S %z', '%a, %d %b %Y %H:%M:%S GMT', '%d %b %Y %H:%M:%S %z', '%Y-%m-%d %H:%M:%S'):
+                for fmt in (
+                    '%a, %d %b %Y %H:%M:%S %z',
+                    '%a, %d %b %Y %H:%M:%S GMT',
+                    '%a, %d %b %Y %H:%M:%S',
+                    '%d %b %Y %H:%M:%S %z',
+                    '%d %b %Y %H:%M:%S GMT',
+                    '%d %b %Y %H:%M:%S',
+                    '%Y-%m-%d %H:%M:%S',
+                    '%Y-%m-%dT%H:%M:%S%z',
+                    '%Y-%m-%d'
+                ):
                     try:
                         # Clean up timezone strings that python might struggle with
                         cleaned_date = pub_date_str.replace("IST", "+0530")
                         pub_date = datetime.strptime(cleaned_date, fmt)
+                        if pub_date.tzinfo is not None:
+                            pub_date = pub_date.replace(tzinfo=None)
                         break
                     except ValueError:
                         continue
+            
+            # Filter for last 7 days if it's Google News
+            if "googlenews" in feed_name.lower() and pub_date:
+                time_diff = datetime.now() - pub_date
+                if time_diff.days > 7:
+                    continue
             
             # Format date for consistency
             formatted_date = pub_date.strftime('%Y-%m-%d %H:%M:%S') if pub_date else pub_date_str
             
             news_items.append({
-                "source": feed_name,
+                "source": item_source,
                 "title": title,
                 "description": desc,
                 "published_at": formatted_date,
@@ -121,8 +155,8 @@ def analyze_sentiment(news_items: list) -> pd.DataFrame:
 
 def fetch_and_analyze_sentiment(keyword_filter: str = None, save_dir: str = "data") -> pd.DataFrame:
     """
-    Fetches all configured RSS feeds, computes sentiment, filters by keyword if provided,
-    and saves to a CSV.
+    Fetches all configured RSS feeds, including Google News search feed, computes sentiment,
+    filters by keyword if provided, sorts them chronologically, and saves to a CSV.
     
     Parameters:
     - keyword_filter: Filter news where title/description contains this keyword (case-insensitive).
@@ -132,8 +166,15 @@ def fetch_and_analyze_sentiment(keyword_filter: str = None, save_dir: str = "dat
     - DataFrame of scored news headlines.
     """
     all_news = []
+    
+    # 1. Fetch standard news RSS feeds
     for name, url in RSS_FEEDS.items():
         all_news.extend(parse_rss_feed(name, url))
+        
+    # 2. Fetch Google News search feed
+    google_query = keyword_filter if keyword_filter else "Indian stock market"
+    google_url = f"https://news.google.com/rss/search?q={google_query}&hl=en-IN&gl=IN&ceid=IN:en"
+    all_news.extend(parse_rss_feed("GoogleNews", google_url))
         
     if not all_news:
         logging.warning("No news fetched from any source.")
@@ -141,18 +182,23 @@ def fetch_and_analyze_sentiment(keyword_filter: str = None, save_dir: str = "dat
         
     df = analyze_sentiment(all_news)
     
-    # Filter by keyword if requested
+    # 3. Filter by keyword if requested (bypassing Google News search results as they are already filtered)
     if keyword_filter and not df.empty:
         logging.info(f"Filtering news containing keyword: '{keyword_filter}'...")
-        # Check both title and description
         keyword_lower = keyword_filter.lower()
-        mask = df['title'].str.lower().str.contains(keyword_lower) | df['description'].str.lower().str.contains(keyword_lower)
-        df = df[mask]
-        logging.info(f"Found {len(df)} matching news articles.")
+        is_google = df['source'].str.startswith('GoogleNews')
+        matches_keyword = df['title'].str.lower().str.contains(keyword_lower) | df['description'].str.lower().str.contains(keyword_lower)
+        df = df[is_google | matches_keyword]
+        logging.info(f"Found {len(df)} matching news articles (including Google News).")
         
     if df.empty:
         logging.warning("No headlines matched filter criteria or no articles found.")
         return df
+        
+    # 4. Sort the DataFrame chronologically (newest first)
+    df['temp_date'] = pd.to_datetime(df['published_at'], errors='coerce')
+    df = df.sort_values(by='temp_date', ascending=False, na_position='last')
+    df = df.drop(columns=['temp_date'])
         
     # Ensure target directory exists
     os.makedirs(save_dir, exist_ok=True)
