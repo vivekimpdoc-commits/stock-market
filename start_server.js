@@ -36,6 +36,13 @@ let pythonPath = 'python'; // Default fallback
 // List of base directories to search in Windows
 const searchBases = [
     path.join('C:', 'Users', 'DELL', 'AppData', 'Local', 'Programs', 'Python'),
+    path.join('C:', 'Program Files', 'Python312'),
+    path.join('C:', 'Program Files', 'Python311'),
+    path.join('C:', 'Program Files', 'Python310'),
+    path.join('C:', 'Program Files', 'Python39'),
+    path.join('C:', 'Program Files', 'Python38'),
+    path.join('C:', 'Program Files'),
+    path.join('C:', 'Program Files (x86)'),
     path.join('C:', 'Users', 'DELL', 'anaconda3'),
     path.join('C:', 'Users', 'DELL', 'miniconda3'),
     path.join('C:', 'Users', 'DELL', 'AppData', 'Local', 'Programs', 'Thonny'),
