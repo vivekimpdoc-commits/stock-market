@@ -81,7 +81,7 @@ def run_end_to_end_pipeline(ticker: str, start_date: str = "2011-01-01", initial
         return False
         
     print("\n" + "=" * 70)
-    print("      ✓ END-TO-END AI PIPELINE SUCCESSFULLY RUN & COMPLETED!      ")
+    print("      [OK] END-TO-END AI PIPELINE SUCCESSFULLY RUN & COMPLETED!      ")
     print("=" * 70)
     print(f"Results generated for {ticker}:")
     print(f"   - Daily Price Rows:      {len(price_df)}")

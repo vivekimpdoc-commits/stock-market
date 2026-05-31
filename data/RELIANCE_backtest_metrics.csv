@@ -1,0 +1,12 @@
+Metric,Value
+Ticker,RELIANCE
+Initial_Capital,100000.0
+AI_Final_Value,107465.94538635254
+Benchmark_Final_Value,116788.43787719727
+AI_Total_Return,0.07465945386352542
+Benchmark_Total_Return,0.1678843787719727
+Annualized_Sharpe_Ratio,-1.0798694419035024
+Max_Drawdown,-0.020529900338339655
+Total_Trades,16
+Completed_Trades,8
+Win_Rate,0.5
