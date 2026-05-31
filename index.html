@@ -727,7 +727,7 @@
                 <div class="glass-panel">
                     <h3 style="margin-bottom: 20px; font-size: 22px;">AI Model Prediction</h3>
                     <div id="recommendationCard" class="recommendation-card buy-mode">
-                        <span style="font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted);">AI Forecast Action</span>
+                        <span style="font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted);" id="forecastModelType">AI Forecast Action</span>
                         <div class="recommendation-badge" id="recomAction">BUY</div>
                         <p id="recomDetails" style="max-width: 450px; line-height: 1.5; font-size: 15px;">Model predicts the price trend to be UP tomorrow. Consider buying.</p>
                         
@@ -1048,6 +1048,12 @@
                 
                 recomAction.innerText = data.recommendation;
                 recomDetails.innerText = data.details;
+                
+                // Update model type in header
+                const modelTypeHeader = document.getElementById("forecastModelType");
+                if (modelTypeHeader) {
+                    modelTypeHeader.innerText = data.model_type || "AI Forecast Action";
+                }
                 
                 if (data.prediction_code === 1) {
                     recomCard.className = "recommendation-card buy-mode";
