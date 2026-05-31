@@ -1,91 +1,124 @@
 const fs = require('fs');
-const { spawn } = require('child_process');
+const { spawn, execSync } = require('child_process');
 const path = require('path');
 
-// Recursive search for python.exe
-function findPythonRecursive(dir) {
-    if (!fs.existsSync(dir)) return null;
+// Test if python path has required modules
+function testPython(pythonPath) {
     try {
-        const files = fs.readdirSync(dir);
-        for (const file of files) {
-            const fullPath = path.join(dir, file);
-            try {
-                const stat = fs.statSync(fullPath);
-                if (stat.isDirectory()) {
-                    // Skip folders like Scripts, Lib, tcl, etc. to search faster
-                    if (['Scripts', 'Lib', 'libs', 'tcl', 'share', 'include'].includes(file)) {
-                        continue;
-                    }
-                    const found = findPythonRecursive(fullPath);
-                    if (found) return found;
-                } else if (file.toLowerCase() === 'python.exe') {
-                    return fullPath;
-                }
-            } catch (e) {
-                // Ignore errors for individual files
-            }
-        }
+        execSync(`"${pythonPath}" -c "import fastapi, pandas, uvicorn"`, { stdio: 'ignore' });
+        return true;
     } catch (e) {
-        // Ignore read dir errors
+        return false;
     }
-    return null;
 }
 
-let pythonPath = 'python'; // Default fallback
+// Generate all candidate python executable paths
+function getCandidates() {
+    const userProfile = process.env.USERPROFILE || 'C:\\Users\\DELL';
+    const candidates = [];
 
-// List of base directories to search in Windows
-const searchBases = [
-    path.join('C:', 'Users', 'DELL', 'AppData', 'Local', 'Programs', 'Python'),
-    path.join('C:', 'Program Files', 'Python312'),
-    path.join('C:', 'Program Files', 'Python311'),
-    path.join('C:', 'Program Files', 'Python310'),
-    path.join('C:', 'Program Files', 'Python39'),
-    path.join('C:', 'Program Files', 'Python38'),
-    path.join('C:', 'Program Files'),
-    path.join('C:', 'Program Files (x86)'),
-    path.join('C:', 'Users', 'DELL', 'anaconda3'),
-    path.join('C:', 'Users', 'DELL', 'miniconda3'),
-    path.join('C:', 'Users', 'DELL', 'AppData', 'Local', 'Programs', 'Thonny'),
-    'C:\\'
-];
+    // 0. Search in virtual environments in workspace and parent directories
+    const workspaceDir = __dirname;
+    const parent1 = path.resolve(workspaceDir, '..');
+    const parent2 = path.resolve(workspaceDir, '../..');
+    const parent3 = path.resolve(workspaceDir, '../../..');
+    
+    const venvs = ['.venv', 'venv', 'env', 'conda-env', 'stock-market-env', 'stock-env', 'pyenv'];
+    for (const pDir of [workspaceDir, parent1, parent2, parent3]) {
+        for (const venv of venvs) {
+            candidates.push(path.join(pDir, venv, 'Scripts', 'python.exe'));
+            candidates.push(path.join(pDir, venv, 'bin', 'python.exe'));
+            candidates.push(path.join(pDir, venv, 'python.exe'));
+        }
+    }
 
-console.log('[*] Searching for python.exe on your Windows system...');
-
-for (const base of searchBases) {
-    if (fs.existsSync(base)) {
-        console.log(`Searching in: ${base}...`);
-        
-        // Special case for searching C:\ to avoid full system scanning (which takes too long)
-        if (base === 'C:\\') {
-            try {
-                const dirs = fs.readdirSync(base);
-                for (const d of dirs) {
-                    if (d.toLowerCase().startsWith('python')) {
-                        const fullD = path.join(base, d);
-                        const p = path.join(fullD, 'python.exe');
-                        if (fs.existsSync(p)) {
-                            pythonPath = p;
-                            break;
-                        }
-                    }
+    // 1. Search in PATH (excluding WindowsApps)
+    const pathEnv = process.env.PATH || '';
+    const paths = pathEnv.split(path.delimiter);
+    for (const p of paths) {
+        if (!p || p.toLowerCase().includes('microsoft\\windowsapps')) continue;
+        try {
+            const files = fs.readdirSync(p);
+            for (const f of files) {
+                if (f.toLowerCase() === 'python.exe' || f.toLowerCase() === 'python3.exe') {
+                    candidates.push(path.join(p, f));
                 }
-            } catch (e) {}
-            if (pythonPath !== 'python') break;
-            continue;
+            }
+        } catch (e) {}
+    }
+
+    // 2. Common paths in User Profile AppData Local Programs
+    for (let v = 7; v <= 15; v++) {
+        candidates.push(path.join(userProfile, 'AppData', 'Local', 'Programs', 'Python', `Python3${v}`, 'python.exe'));
+        candidates.push(path.join(userProfile, 'AppData', 'Local', 'Programs', 'Python', `Python${v}`, 'python.exe'));
+    }
+
+    // 3. Program Files
+    for (let v = 7; v <= 15; v++) {
+        candidates.push(`C:\\Program Files\\Python3${v}\\python.exe`);
+        candidates.push(`C:\\Program Files\\Python${v}\\python.exe`);
+        candidates.push(`C:\\Program Files (x86)\\Python3${v}\\python.exe`);
+        candidates.push(`C:\\Program Files (x86)\\Python${v}\\python.exe`);
+    }
+
+    // 4. Anaconda, Miniconda, Thonny, etc.
+    const bases = [
+        path.join(userProfile, 'anaconda3'),
+        path.join(userProfile, 'miniconda3'),
+        'C:\\anaconda3',
+        'C:\\miniconda3',
+        path.join(userProfile, 'AppData', 'Local', 'Programs', 'Thonny'),
+        path.join(userProfile, 'AppData', 'Local', 'Python', 'bin')
+    ];
+    for (const b of bases) {
+        candidates.push(path.join(b, 'python.exe'));
+    }
+
+    // 5. C:\ python folders
+    for (let v = 7; v <= 15; v++) {
+        candidates.push(`C:\\Python3${v}\\python.exe`);
+        candidates.push(`C:\\Python${v}\\python.exe`);
+    }
+
+    // Deduplicate and filter by exists
+    const uniqueCandidates = [...new Set(candidates)];
+    return uniqueCandidates.filter(p => {
+        try {
+            return fs.existsSync(p);
+        } catch (e) {
+            return false;
         }
-        
-        const found = findPythonRecursive(base);
-        if (found) {
-            pythonPath = found;
-            break;
-        }
+    });
+}
+
+console.log('[*] Locating Python environment...');
+const existingPythons = getCandidates();
+
+let pythonPath = null;
+let foundWorking = false;
+
+console.log(`[*] Found ${existingPythons.length} Python executable(s) on your system.`);
+
+// Check for one that has dependencies installed
+for (const p of existingPythons) {
+    console.log(`Testing: ${p}...`);
+    if (testPython(p)) {
+        pythonPath = p;
+        foundWorking = true;
+        console.log(`[✓] Selected working Python environment with required dependencies: ${p}`);
+        break;
     }
 }
 
-if (pythonPath !== 'python') {
-    console.log(`[✓] Located Python interpreter at: ${pythonPath}`);
-} else {
-    console.log('[!] python.exe not found in standard directories. Using default "python" command.');
+// Fallback to first existing one
+if (!pythonPath && existingPythons.length > 0) {
+    pythonPath = existingPythons[0];
+    console.log(`[!] No Python environment with all required modules (fastapi, pandas, uvicorn) found. Falling back to first found: ${pythonPath}`);
+}
+
+if (!pythonPath) {
+    console.log('[!] python.exe not found on the system. Using default "python" command.');
+    pythonPath = 'python';
 }
 
 console.log('[*] Starting FastAPI Uvicorn Server...');

@@ -1,6 +1,6 @@
 import os
 import pandas as pd
-import pandas_ta as ta
+import numpy as np
 import logging
 
 # Configure logging
@@ -9,7 +9,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 def calculate_technical_indicators(input_filepath: str, save_dir: str = "data") -> pd.DataFrame:
     """
     Reads a stock price CSV file, calculates a set of technical indicators
-    using pandas-ta, and saves the updated DataFrame to a new CSV file.
+    using pure pandas (equivalent to pandas-ta columns), and saves the updated DataFrame.
     
     Parameters:
     - input_filepath: Path to the daily prices CSV file
@@ -33,43 +33,62 @@ def calculate_technical_indicators(input_filepath: str, save_dir: str = "data") 
             logging.error(f"Required columns {missing_cols} are missing from the input data.")
             return None
             
-        # Ensure 'Date' is set as the datetime index for pandas-ta calculations
-        if 'Date' in df.columns:
-            df['Date'] = pd.to_datetime(df['Date'])
-            df.set_index('Date', inplace=True)
-        else:
-            logging.warning("No 'Date' column found. Proceeding with default indexing.")
-            
-        logging.info("Calculating technical indicators...")
+        logging.info("Calculating technical indicators using pure pandas...")
         
         # 1. Trend Indicators
-        df.ta.sma(length=50, append=True)
-        df.ta.sma(length=200, append=True)
-        df.ta.ema(length=20, append=True)
+        df['SMA_50'] = df['Close'].rolling(window=50).mean()
+        df['SMA_200'] = df['Close'].rolling(window=200).mean()
+        df['EMA_20'] = df['Close'].ewm(span=20, adjust=False).mean()
         
-        # 2. Momentum Indicators
-        df.ta.rsi(length=14, append=True)
-        df.ta.macd(fast=12, slow=26, signal=9, append=True)
+        # 2. Momentum Indicators (RSI & MACD)
+        # RSI 14
+        delta = df['Close'].diff()
+        gain = (delta.where(delta > 0, 0.0)).ewm(alpha=1/14, adjust=False).mean()
+        loss = (-delta.where(delta < 0, 0.0)).ewm(alpha=1/14, adjust=False).mean()
+        rs = gain / (loss + 1e-10)
+        df['RSI_14'] = 100.0 - (100.0 / (1.0 + rs))
         
-        # 3. Volatility Indicators
-        df.ta.bbands(length=20, std=2.0, append=True)
-        df.ta.atr(length=14, append=True)
+        # MACD (12, 26, 9)
+        ema_fast = df['Close'].ewm(span=12, adjust=False).mean()
+        ema_slow = df['Close'].ewm(span=26, adjust=False).mean()
+        df['MACD_12_26_9'] = ema_fast - ema_slow
+        df['MACDs_12_26_9'] = df['MACD_12_26_9'].ewm(span=9, adjust=False).mean()
+        df['MACDh_12_26_9'] = df['MACD_12_26_9'] - df['MACDs_12_26_9']
         
-        # 4. Volume Indicators
-        df.ta.obv(append=True)
+        # 3. Volatility Indicators (Bollinger Bands & ATR)
+        # Bollinger Bands (20, 2)
+        df['BBM_20_2.0'] = df['Close'].rolling(window=20).mean()
+        std = df['Close'].rolling(window=20).std()
+        df['BBU_20_2.0'] = df['BBM_20_2.0'] + (2.0 * std)
+        df['BBL_20_2.0'] = df['BBM_20_2.0'] - (2.0 * std)
+        df['BBB_20_2.0'] = ((df['BBU_20_2.0'] - df['BBL_20_2.0']) / df['BBM_20_2.0']) * 100.0
+        df['BBP_20_2.0'] = (df['Close'] - df['BBL_20_2.0']) / (df['BBU_20_2.0'] - df['BBL_20_2.0'] + 1e-10)
         
-        # Reset index back so Date becomes a normal column again
-        df.reset_index(inplace=True)
+        # ATR 14 (Wilder's smoothing)
+        high_low = df['High'] - df['Low']
+        high_cp = (df['High'] - df['Close'].shift()).abs()
+        low_cp = (df['Low'] - df['Close'].shift()).abs()
+        tr = pd.concat([high_low, high_cp, low_cp], axis=1).max(axis=1)
+        df['ATRr_14'] = tr.ewm(alpha=1/14, adjust=False).mean()
         
-        # Format the Date back to standard string for CSV
-        if 'Date' in df.columns:
-            df['Date'] = df['Date'].dt.strftime('%Y-%m-%d')
-            
+        # 4. Volume Indicators (OBV)
+        obv = [0.0]
+        close_vals = df['Close'].values
+        vol_vals = df['Volume'].values
+        for i in range(1, len(df)):
+            if close_vals[i] > close_vals[i-1]:
+                obv.append(obv[-1] + vol_vals[i])
+            elif close_vals[i] < close_vals[i-1]:
+                obv.append(obv[-1] - vol_vals[i])
+            else:
+                obv.append(obv[-1])
+        df['OBV'] = obv
+        
         # Save output
         os.makedirs(save_dir, exist_ok=True)
         filename = os.path.basename(input_filepath)
         output_filename = filename.replace("_prices.csv", "_indicators.csv")
-        if output_filename == filename:  # Fallback if name format is unexpected
+        if output_filename == filename:
             output_filename = "indicators_" + filename
             
         output_filepath = os.path.join(save_dir, output_filename)
