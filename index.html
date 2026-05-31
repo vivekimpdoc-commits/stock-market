@@ -358,15 +358,21 @@
             line-height: 1.6;
         }
 
-        /* Predict Tab Styles */
-        .predict-grid {
+        /* Dashboard Layout Styles */
+        .dashboard-grid {
             display: grid;
-            grid-template-columns: 1.5fr 1fr;
+            grid-template-columns: 1fr 1fr;
             gap: 25px;
         }
 
-        @media (max-width: 900px) {
-            .predict-grid {
+        .dashboard-column {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        @media (max-width: 1000px) {
+            .dashboard-grid {
                 grid-template-columns: 1fr;
             }
         }
@@ -902,9 +908,8 @@
 
     <main>
         <!-- Tab navigation -->
-        <div class="navigation-tabs">
-            <button class="tab-btn active" onclick="switchTab(event, 'predict-tab')">Trend Forecasting</button>
-            <button class="tab-btn" onclick="switchTab(event, 'sentiment-tab')">News Sentiment</button>
+        <div class="navigation-tabs" id="navTabs" style="display: none;">
+            <button class="tab-btn active" onclick="switchTab(event, 'dashboard-tab')">Stock Dashboard</button>
             <button class="tab-btn" onclick="switchTab(event, 'portfolio-tab')">Portfolio Optimization</button>
         </div>
 
@@ -920,64 +925,71 @@
             <p>Enter any National Stock Exchange (NSE) stock ticker (like <strong>RELIANCE</strong>, <strong>TCS</strong>, or <strong>INFY</strong>) in the search bar above to fetch predictions, technical indicators, and news sentiment scores directly sourced from the official NSE market data feed.</p>
         </div>
 
-        <!-- Predict Tab Content -->
-        <div id="predict-tab" class="tab-content">
-            <div class="predict-grid">
-                <div class="glass-panel">
-                    <h3 style="margin-bottom: 20px; font-size: 22px;">AI Model Prediction</h3>
-                    <div id="recommendationCard" class="recommendation-card buy-mode">
-                        <span style="font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted);" id="forecastModelType">AI Forecast Action</span>
-                        <div class="recommendation-badge" id="recomAction">BUY</div>
-                        <p id="recomDetails" style="max-width: 450px; line-height: 1.5; font-size: 15px;">Model predicts the price trend to be UP tomorrow. Consider buying.</p>
+        <!-- Dashboard Tab Content (Unified View) -->
+        <div id="dashboard-tab" class="tab-content">
+            <div class="dashboard-grid">
+                
+                <!-- Left Column (Predict & Snapshot) -->
+                <div class="dashboard-column">
+                    <div class="glass-panel">
+                        <h3 style="margin-bottom: 20px; font-size: 22px;">AI Model Prediction</h3>
+                        <div id="recommendationCard" class="recommendation-card buy-mode">
+                            <span style="font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted);" id="forecastModelType">AI Forecast Action</span>
+                            <div class="recommendation-badge" id="recomAction">BUY</div>
+                            <p id="recomDetails" style="max-width: 450px; line-height: 1.5; font-size: 15px;">Model predicts the price trend to be UP tomorrow. Consider buying.</p>
+                            
+                            <div style="margin-top: 25px; font-size: 13px; color: var(--text-muted);">Model Confidence</div>
+                            <div class="confidence-container">
+                                <div class="confidence-bar" id="confidenceBar" style="width: 85%;"></div>
+                                <div class="confidence-label" id="confidencePercent">85.0%</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel">
+                        <h3 style="margin-bottom: 20px; font-size: 22px;">Stock Snapshot</h3>
+                        <table class="info-table">
+                            <tr>
+                                <td>Symbol (NSE)</td>
+                                <td id="infoTicker">RELIANCE.NS</td>
+                            </tr>
+                            <tr>
+                                <td>Last Close Price</td>
+                                <td id="infoClose">₹ 2,450.50</td>
+                            </tr>
+                            <tr>
+                                <td>Prediction Date</td>
+                                <td id="infoDate">2026-05-30</td>
+                            </tr>
+                            <tr>
+                                <td>Prediction Trend</td>
+                                <td id="infoTrend" style="color: var(--success-color);">UP</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Right Column (Sentiment) -->
+                <div class="dashboard-column">
+                    <div class="glass-panel" style="height: 100%;">
+                        <div class="sentiment-summary-panel">
+                            <div>
+                                <h3 style="font-size: 22px; margin-bottom: 5px;">News Sentiment</h3>
+                                <p style="color: var(--text-muted);">Scraped and scored from Moneycontrol, Livemint, and Economic Times</p>
+                            </div>
+                            <div style="text-align: right;">
+                                <div class="sentiment-score-gauge" id="sentimentGauge">Positive</div>
+                                <p style="color: var(--text-muted);" id="sentimentMeanScore">Average Score: +0.45</p>
+                            </div>
+                        </div>
                         
-                        <div style="margin-top: 25px; font-size: 13px; color: var(--text-muted);">Model Confidence</div>
-                        <div class="confidence-container">
-                            <div class="confidence-bar" id="confidenceBar" style="width: 85%;"></div>
-                            <div class="confidence-label" id="confidencePercent">85.0%</div>
+                        <h4 style="margin-bottom: 20px; color: var(--text-muted); font-size: 15px;" id="newsFoundLabel">Recent News Scored</h4>
+                        <div id="headlinesContainer">
+                            <!-- Headlines added dynamically -->
                         </div>
                     </div>
                 </div>
 
-                <div class="glass-panel">
-                    <h3 style="margin-bottom: 20px; font-size: 22px;">Stock Snapshot</h3>
-                    <table class="info-table">
-                        <tr>
-                            <td>Symbol (NSE)</td>
-                            <td id="infoTicker">RELIANCE.NS</td>
-                        </tr>
-                        <tr>
-                            <td>Last Close Price</td>
-                            <td id="infoClose">₹ 2,450.50</td>
-                        </tr>
-                        <tr>
-                            <td>Prediction Date</td>
-                            <td id="infoDate">2026-05-30</td>
-                        </tr>
-                        <tr>
-                            <td>Prediction Trend</td>
-                            <td id="infoTrend" style="color: var(--success-color);">UP</td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- Sentiment Tab Content -->
-        <div id="sentiment-tab" class="tab-content glass-panel">
-            <div class="sentiment-summary-panel">
-                <div>
-                    <h3 style="font-size: 22px; margin-bottom: 5px;">News Sentiment</h3>
-                    <p style="color: var(--text-muted);">Scraped and scored from Moneycontrol, Livemint, and Economic Times</p>
-                </div>
-                <div style="text-align: right;">
-                    <div class="sentiment-score-gauge" id="sentimentGauge">Positive</div>
-                    <p style="color: var(--text-muted);" id="sentimentMeanScore">Average Score: +0.45</p>
-                </div>
-            </div>
-            
-            <h4 style="margin-bottom: 20px; color: var(--text-muted); font-size: 15px;" id="newsFoundLabel">Recent News Scored</h4>
-            <div id="headlinesContainer">
-                <!-- Headlines added dynamically -->
             </div>
         </div>
 
@@ -1213,9 +1225,9 @@
 
         // Hide all views except welcome
         function initDashboard() {
-            document.getElementById("predict-tab").style.display = "none";
-            document.getElementById("sentiment-tab").style.display = "none";
-            document.getElementById("portfolio-tab").style.display = "none";
+            const contents = document.querySelectorAll(".tab-content");
+            contents.forEach(c => c.classList.remove("active"));
+            document.getElementById("navTabs").style.display = "none";
             document.getElementById("portfolioResults").style.display = "none";
         }
         initDashboard();
@@ -1233,10 +1245,16 @@
             document.getElementById("globalLoader").style.display = "flex";
             document.getElementById("welcomeView").style.display = "none";
             
-            // Show Tab Contents
-            document.getElementById("predict-tab").style.display = "block";
-            document.getElementById("sentiment-tab").style.display = "block";
-            document.getElementById("portfolio-tab").style.display = "block";
+            // Show Navigation Tabs and activate Dashboard by default
+            document.getElementById("navTabs").style.display = "flex";
+            const contents = document.querySelectorAll(".tab-content");
+            contents.forEach(c => c.classList.remove("active"));
+            
+            const tablinks = document.querySelectorAll(".tab-btn");
+            tablinks.forEach(link => link.classList.remove("active"));
+            
+            document.getElementById("dashboard-tab").classList.add("active");
+            tablinks[0].classList.add("active");
             
             // Fetch Predict and Sentiment data in parallel
             Promise.all([

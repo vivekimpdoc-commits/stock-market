@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | NSE AI Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4f46e5; /* Deep Purple/Blue */
+            --primary-hover: #4338ca;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-main: #111827;
+            --text-muted: #6b7280;
+            --border-color: #d1d5db;
+            --error-color: #ef4444;
+            --success-color: #10b981;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-color);
+            background-image: radial-gradient(circle at 10% 20%, rgba(79, 70, 229, 0.05) 0%, transparent 40%), 
+                              radial-gradient(circle at 90% 80%, rgba(79, 70, 229, 0.08) 0%, transparent 40%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-main);
+            padding: 20px;
+        }
+
+        /* 1. Layout & Structure */
+        .auth-card {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 420px;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0,0,0,0.05);
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .auth-header h2 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .auth-header p {
+            color: var(--text-muted);
+            font-size: 15px;
+        }
+
+        /* Social Login Buttons */
+        .social-login {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .social-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: #fff;
+            color: var(--text-main);
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .social-btn:hover {
+            background: #f9fafb;
+            border-color: #9ca3af;
+        }
+
+        .social-btn img {
+            width: 20px;
+            height: 20px;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 13px;
+            margin-bottom: 25px;
+        }
+
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .divider::before { margin-right: 15px; }
+        .divider::after { margin-left: 15px; }
+
+        /* Single-Column Form with Floating Labels */
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 16px 16px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 15px;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s;
+            background: transparent;
+        }
+
+        /* Floating Label Logic */
+        .input-group label {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 15px;
+            pointer-events: none;
+            transition: 0.2s ease all;
+            background: #fff;
+            padding: 0 4px;
+        }
+
+        .input-group input:focus,
+        .input-group input:not(:placeholder-shown) {
+            border-color: var(--primary);
+        }
+
+        .input-group input:focus ~ label,
+        .input-group input:not(:placeholder-shown) ~ label {
+            top: 0;
+            font-size: 12px;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* Password Toggle */
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: var(--text-muted);
+            font-size: 18px;
+            user-select: none;
+        }
+
+        .password-toggle:hover {
+            color: var(--text-main);
+        }
+
+        /* Password Requirements */
+        .password-reqs {
+            display: none;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: -12px;
+            padding-left: 5px;
+        }
+        
+        .password-reqs.active {
+            display: block;
+        }
+
+        .req-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 4px;
+        }
+
+        .req-item.met { color: var(--success-color); }
+        .req-item.unmet { color: var(--error-color); }
+
+        /* Inline Validation Error */
+        .error-msg {
+            color: var(--error-color);
+            font-size: 12px;
+            margin-top: 4px;
+            display: none;
+            padding-left: 5px;
+        }
+        .input-group.error input { border-color: var(--error-color); }
+        .input-group.error .error-msg { display: block; }
+        .input-group.error label { color: var(--error-color) !important; }
+
+        /* Primary Button */
+        .primary-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+
+        .primary-btn:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .primary-btn:active {
+            transform: translateY(1px);
+        }
+
+        /* Loading State */
+        .spinner {
+            display: none;
+            width: 18px;
+            height: 18px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+        }
+
+        .primary-btn.loading .spinner { display: block; }
+        .primary-btn.loading .btn-text { display: none; }
+        .primary-btn.loading { pointer-events: none; opacity: 0.9; }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Switch Mode */
+        .switch-mode {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .switch-mode a {
+            color: var(--primary);
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .switch-mode a:hover {
+            text-decoration: underline;
+        }
+
+        /* Mobile Friendly Adjustments */
+        @media (max-width: 480px) {
+            .auth-card {
+                padding: 30px 20px;
+                border-radius: 12px;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="auth-card" id="authCard">
+        <div class="auth-header">
+            <h2 id="formTitle">Welcome Back</h2>
+            <p id="formSubtitle">Log in to your account</p>
+        </div>
+
+        <div class="social-login">
+            <button class="social-btn">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google">
+                Continue with Google
+            </button>
+            <!-- Apple / FB can be added similarly -->
+        </div>
+
+        <div class="divider">OR</div>
+
+        <form id="authForm" onsubmit="handleSubmit(event)">
+            <div class="input-group" id="emailGroup">
+                <input type="email" id="email" placeholder=" " required oninput="validateEmail()">
+                <label for="email">Email Address</label>
+                <div class="error-msg" id="emailError">Please enter a valid email address.</div>
+            </div>
+
+            <div class="input-group" id="passGroup">
+                <input type="password" id="password" placeholder=" " required oninput="validatePassword()">
+                <label for="password">Password</label>
+                <span class="password-toggle" onclick="togglePassword()">👁️</span>
+                <div class="error-msg" id="passError">Password is required.</div>
+            </div>
+
+            <!-- Password Requirements (Only visible on Sign Up) -->
+            <div class="password-reqs" id="passReqs">
+                <div class="req-item unmet" id="reqUpper">● At least 1 uppercase letter</div>
+                <div class="req-item unmet" id="reqNumber">● At least 1 number</div>
+                <div class="req-item unmet" id="reqLen">● Minimum 8 characters</div>
+            </div>
+
+            <button type="submit" class="primary-btn" id="submitBtn">
+                <span class="btn-text" id="submitText">Login</span>
+                <div class="spinner"></div>
+            </button>
+        </form>
+
+        <div class="switch-mode">
+            <span id="switchText">Don't have an account?</span> 
+            <a onclick="toggleMode()" id="switchAction">Sign Up</a>
+        </div>
+    </div>
+
+    <script>
+        let isLoginMode = true;
+
+        const authForm = document.getElementById('authForm');
+        const emailInput = document.getElementById('email');
+        const passInput = document.getElementById('password');
+        
+        const formTitle = document.getElementById('formTitle');
+        const formSubtitle = document.getElementById('formSubtitle');
+        const submitText = document.getElementById('submitText');
+        const switchText = document.getElementById('switchText');
+        const switchAction = document.getElementById('switchAction');
+        const passReqs = document.getElementById('passReqs');
+
+        // Toggle Password Visibility
+        function togglePassword() {
+            const type = passInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passInput.setAttribute('type', type);
+        }
+
+        // Switch between Login and Sign Up
+        function toggleMode() {
+            isLoginMode = !isLoginMode;
+            
+            // Clear inputs and errors
+            authForm.reset();
+            document.getElementById('emailGroup').classList.remove('error');
+            document.getElementById('passGroup').classList.remove('error');
+
+            if (isLoginMode) {
+                formTitle.innerText = "Welcome Back";
+                formSubtitle.innerText = "Log in to your account";
+                submitText.innerText = "Login";
+                switchText.innerText = "Don't have an account?";
+                switchAction.innerText = "Sign Up";
+                passReqs.classList.remove('active');
+            } else {
+                formTitle.innerText = "Create Account";
+                formSubtitle.innerText = "Sign up to get started";
+                submitText.innerText = "Sign Up";
+                switchText.innerText = "Already have an account?";
+                switchAction.innerText = "Login";
+                passReqs.classList.add('active');
+                validatePassword(); // Reset requirement colors
+            }
+        }
+
+        // Inline Validation: Email
+        function validateEmail() {
+            const group = document.getElementById('emailGroup');
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            
+            if (emailInput.value.length > 0 && !emailRegex.test(emailInput.value)) {
+                group.classList.add('error');
+                return false;
+            } else {
+                group.classList.remove('error');
+                return true;
+            }
+        }
+
+        // Inline Validation: Password
+        function validatePassword() {
+            const val = passInput.value;
+            const group = document.getElementById('passGroup');
+            
+            // If in sign up mode, update requirement trackers
+            if (!isLoginMode) {
+                const reqUpper = document.getElementById('reqUpper');
+                const reqNumber = document.getElementById('reqNumber');
+                const reqLen = document.getElementById('reqLen');
+
+                const hasUpper = /[A-Z]/.test(val);
+                const hasNumber = /[0-9]/.test(val);
+                const hasLen = val.length >= 8;
+
+                reqUpper.className = "req-item " + (hasUpper ? "met" : "unmet");
+                reqNumber.className = "req-item " + (hasNumber ? "met" : "unmet");
+                reqLen.className = "req-item " + (hasLen ? "met" : "unmet");
+                
+                if (val.length > 0 && (!hasUpper || !hasNumber || !hasLen)) {
+                    group.classList.add('error');
+                    document.getElementById('passError').innerText = "Please meet all password requirements.";
+                    return false;
+                } else {
+                    group.classList.remove('error');
+                    return true;
+                }
+            } else {
+                // In Login mode, just check if it's not empty
+                if (val.length === 0 && document.activeElement !== passInput) {
+                    group.classList.add('error');
+                    document.getElementById('passError').innerText = "Password is required.";
+                    return false;
+                } else {
+                    group.classList.remove('error');
+                    return true;
+                }
+            }
+        }
+
+        // Handle Submit and Show Loading State
+        function handleSubmit(e) {
+            e.preventDefault();
+            
+            const isEmailValid = validateEmail();
+            const isPassValid = validatePassword();
+
+            // Final check before submission
+            if (!emailInput.value) {
+                document.getElementById('emailGroup').classList.add('error');
+            }
+            if (!passInput.value) {
+                document.getElementById('passGroup').classList.add('error');
+            }
+
+            if (!isEmailValid || !isPassValid || !emailInput.value || !passInput.value) {
+                // Shake effect on error could be added here
+                return;
+            }
+
+            const btn = document.getElementById('submitBtn');
+            btn.classList.add('loading');
+
+            // Simulate API Call
+            setTimeout(() => {
+                btn.classList.remove('loading');
+                if (isLoginMode) {
+                    // Navigate to dashboard
+                    window.location.href = "index.html";
+                } else {
+                    alert("Account created successfully! Please login.");
+                    toggleMode();
+                }
+            }, 1500);
+        }
+    </script>
+</body>
+</html>
