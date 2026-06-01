@@ -239,6 +239,59 @@
         .signal-bearish { background: rgba(239,68,68,0.15); color: var(--danger-color); border: 1px solid rgba(239,68,68,0.3); }
         .signal-neutral { background: rgba(245,158,11,0.15); color: var(--accent-gold); border: 1px solid rgba(245,158,11,0.3); }
 
+        /* Quick Links */
+        .quick-links-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 12px;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .quick-link-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 10px;
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--text-color);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+        .quick-link-card:hover {
+            background: rgba(59,130,246,0.08);
+            border-color: rgba(59,130,246,0.35);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.25), 0 0 12px rgba(59,130,246,0.12);
+            color: white;
+        }
+        .quick-link-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        .quick-link-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .quick-link-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+        .quick-link-desc {
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
         /* RSI Gauge */
         .rsi-gauge-wrap {
             margin-top: 8px;
@@ -1451,6 +1504,76 @@
                         <span class="welcome-feature-desc">Applies Markowitz Mean-Variance math to discover allocations for Max Sharpe Ratio or Min Volatility.</span>
                     </div>
                 </div>
+            </div>
+
+            <!-- Useful Resources / Quick Links -->
+            <div class="welcome-section-title" style="margin-top: 30px;">&#128279; Useful Resources &amp; Links</div>
+            <div class="quick-links-grid">
+
+                <a class="quick-link-card" href="https://www.nseindia.com" target="_blank" rel="noopener">
+                    <div class="quick-link-icon" style="background: rgba(0,120,200,0.15); color: #60a5fa;">&#127758;</div>
+                    <div class="quick-link-info">
+                        <span class="quick-link-name">NSE India</span>
+                        <span class="quick-link-desc">Official NSE Portal</span>
+                    </div>
+                </a>
+
+                <a class="quick-link-card" href="https://www.bseindia.com" target="_blank" rel="noopener">
+                    <div class="quick-link-icon" style="background: rgba(245,158,11,0.15); color: var(--accent-gold);">&#127981;</div>
+                    <div class="quick-link-info">
+                        <span class="quick-link-name">BSE India</span>
+                        <span class="quick-link-desc">Bombay Stock Exchange</span>
+                    </div>
+                </a>
+
+                <a class="quick-link-card" href="https://www.moneycontrol.com" target="_blank" rel="noopener">
+                    <div class="quick-link-icon" style="background: rgba(16,185,129,0.15); color: var(--success-color);">&#128200;</div>
+                    <div class="quick-link-info">
+                        <span class="quick-link-name">Moneycontrol</span>
+                        <span class="quick-link-desc">News &amp; Analysis</span>
+                    </div>
+                </a>
+
+                <a class="quick-link-card" href="https://economictimes.indiatimes.com/markets" target="_blank" rel="noopener">
+                    <div class="quick-link-icon" style="background: rgba(239,68,68,0.15); color: #f87171;">&#128240;</div>
+                    <div class="quick-link-info">
+                        <span class="quick-link-name">Economic Times</span>
+                        <span class="quick-link-desc">Markets &amp; Finance</span>
+                    </div>
+                </a>
+
+                <a class="quick-link-card" href="https://zerodha.com/varsity/" target="_blank" rel="noopener">
+                    <div class="quick-link-icon" style="background: rgba(139,92,246,0.15); color: #a78bfa;">&#127979;</div>
+                    <div class="quick-link-info">
+                        <span class="quick-link-name">Zerodha Varsity</span>
+                        <span class="quick-link-desc">Free Learning Hub</span>
+                    </div>
+                </a>
+
+                <a class="quick-link-card" href="https://www.screener.in" target="_blank" rel="noopener">
+                    <div class="quick-link-icon" style="background: rgba(20,184,166,0.15); color: #2dd4bf;">&#128269;</div>
+                    <div class="quick-link-info">
+                        <span class="quick-link-name">Screener.in</span>
+                        <span class="quick-link-desc">Stock Fundamentals</span>
+                    </div>
+                </a>
+
+                <a class="quick-link-card" href="https://www.tickertape.in" target="_blank" rel="noopener">
+                    <div class="quick-link-icon" style="background: rgba(249,115,22,0.15); color: #fb923c;">&#128202;</div>
+                    <div class="quick-link-info">
+                        <span class="quick-link-name">Tickertape</span>
+                        <span class="quick-link-desc">Stock Research</span>
+                    </div>
+                </a>
+
+                <a class="quick-link-card" href="http://127.0.0.1:8000/docs" target="_blank" rel="noopener">
+                    <div class="quick-link-icon" style="background: rgba(59,130,246,0.15); color: var(--accent-blue);">&#128196;</div>
+                    <div class="quick-link-info">
+                        <span class="quick-link-name">API Docs</span>
+                        <span class="quick-link-desc">Swagger / OpenAPI</span>
+                    </div>
+                </a>
+
             </div>
         </div>
 
