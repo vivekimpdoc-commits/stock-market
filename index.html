@@ -928,6 +928,214 @@
             backdrop-filter: blur(10px);
             margin-top: auto;
         }
+
+        /* Welcome Panel Redesign */
+        .welcome-hero {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(245, 158, 11, 0.05) 100%);
+            border-radius: 16px;
+            padding: 40px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: inset 0 0 20px rgba(59, 130, 246, 0.1);
+        }
+
+        .welcome-hero h1 {
+            font-size: 38px;
+            font-weight: 800;
+            background: linear-gradient(90deg, #f8fafc 0%, #cbd5e1 50%, var(--accent-blue) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+        }
+
+        .welcome-section-title {
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--accent-gold);
+            margin: 25px 0 15px 0;
+            text-align: left;
+            width: 100%;
+        }
+
+        /* Quick Stocks Grid */
+        .quick-stocks-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px;
+            width: 100%;
+            margin-bottom: 30px;
+        }
+
+        .quick-stock-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 10px;
+            padding: 15px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: left;
+        }
+
+        .quick-stock-card:hover {
+            background: rgba(59, 130, 246, 0.08);
+            border-color: rgba(59, 130, 246, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3), 0 0 12px rgba(59, 130, 246, 0.15);
+        }
+
+        .quick-stock-symbol {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--text-color);
+        }
+
+        .quick-stock-name {
+            font-size: 11px;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+        }
+
+        .quick-stock-badge {
+            font-size: 10px;
+            background: rgba(59, 130, 246, 0.15);
+            color: #60a5fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 700;
+            margin-top: 4px;
+            text-transform: uppercase;
+        }
+
+        /* Large Index Cards */
+        .welcome-indices-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .welcome-indices-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .welcome-index-card {
+            background: rgba(30, 41, 59, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+        }
+
+        .welcome-index-card::after {
+            content: '';
+            position: absolute;
+            top: -20px; right: -20px;
+            width: 80px; height: 80px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .welcome-index-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .welcome-index-value {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--text-color);
+        }
+
+        .welcome-index-change {
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Feature Cards Grid */
+        .welcome-features-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            .welcome-features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .welcome-feature-card {
+            background: rgba(17, 24, 39, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            padding: 20px 25px;
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+            transition: all 0.3s ease;
+        }
+
+        .welcome-feature-card:hover {
+            background: rgba(17, 24, 39, 0.6);
+            border-color: rgba(255, 255, 255, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .welcome-feature-icon {
+            width: 44px;
+            height: 44px;
+            background: rgba(59, 130, 246, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-blue);
+            flex-shrink: 0;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .welcome-feature-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            text-align: left;
+        }
+
+        .welcome-feature-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+
+        .welcome-feature-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
     </style>
 </head>
 <body>
@@ -976,9 +1184,120 @@
         </div>
 
         <!-- Initial welcome message (when no search done yet) -->
-        <div id="welcomeView" class="glass-panel welcome-panel">
-            <h2>Welcome to NSE India AI Engine</h2>
-            <p>Enter any National Stock Exchange (NSE) stock ticker (like <strong>RELIANCE</strong>, <strong>TCS</strong>, or <strong>INFY</strong>) in the search bar above to fetch predictions, technical indicators, and news sentiment scores directly sourced from the official NSE market data feed.</p>
+        <div id="welcomeView" class="glass-panel welcome-panel" style="border-top: none; padding: 40px;">
+            <!-- Hero Block -->
+            <div class="welcome-hero" style="width: 100%;">
+                <h1>NSE India AI Engine</h1>
+                <p style="font-size: 16px; color: var(--text-muted); margin: 0 auto; max-width: 750px;">
+                    Real-time stock price prediction, news sentiment analytics, and portfolio optimizations. Sourced directly from NSE India with advanced heuristic predictions.
+                </p>
+            </div>
+
+            <!-- Market Indices Section -->
+            <div class="welcome-section-title">Live Market Indicators</div>
+            <div class="welcome-indices-grid">
+                <div class="welcome-index-card" id="card-nifty50">
+                    <span class="welcome-index-name">Nifty 50</span>
+                    <span class="welcome-index-value" id="card-nifty50-val">Fetching...</span>
+                    <span class="welcome-index-change" id="card-nifty50-change">--</span>
+                </div>
+                <div class="welcome-index-card" id="card-niftybank">
+                    <span class="welcome-index-name">Nifty Bank</span>
+                    <span class="welcome-index-value" id="card-niftybank-val">Fetching...</span>
+                    <span class="welcome-index-change" id="card-niftybank-change">--</span>
+                </div>
+                <div class="welcome-index-card" id="card-niftynext50">
+                    <span class="welcome-index-name">Nifty Next 50</span>
+                    <span class="welcome-index-value" id="card-niftynext50-val">Fetching...</span>
+                    <span class="welcome-index-change" id="card-niftynext50-change">--</span>
+                </div>
+            </div>
+
+            <!-- Popular Stocks Tickers -->
+            <div class="welcome-section-title">Select a Popular Stock to Get Started</div>
+            <div class="quick-stocks-grid">
+                <div class="quick-stock-card" onclick="selectItem('RELIANCE')">
+                    <span class="quick-stock-symbol">RELIANCE</span>
+                    <span class="quick-stock-name">Reliance Industries</span>
+                    <span class="quick-stock-badge">Energy / Conglomerate</span>
+                </div>
+                <div class="quick-stock-card" onclick="selectItem('TCS')">
+                    <span class="quick-stock-symbol">TCS</span>
+                    <span class="quick-stock-name">Tata Consultancy Services</span>
+                    <span class="quick-stock-badge">IT Services</span>
+                </div>
+                <div class="quick-stock-card" onclick="selectItem('INFY')">
+                    <span class="quick-stock-symbol">INFY</span>
+                    <span class="quick-stock-name">Infosys Limited</span>
+                    <span class="quick-stock-badge">IT Services</span>
+                </div>
+                <div class="quick-stock-card" onclick="selectItem('HDFCBANK')">
+                    <span class="quick-stock-symbol">HDFCBANK</span>
+                    <span class="quick-stock-name">HDFC Bank Limited</span>
+                    <span class="quick-stock-badge">Banking & Finance</span>
+                </div>
+                <div class="quick-stock-card" onclick="selectItem('TATAMOTORS')">
+                    <span class="quick-stock-symbol">TATAMOTORS</span>
+                    <span class="quick-stock-name">Tata Motors Limited</span>
+                    <span class="quick-stock-badge">Automotive</span>
+                </div>
+                <div class="quick-stock-card" onclick="selectItem('ZOMATO')">
+                    <span class="quick-stock-symbol">ZOMATO</span>
+                    <span class="quick-stock-name">Zomato Limited</span>
+                    <span class="quick-stock-badge">Internet / Delivery</span>
+                </div>
+                <div class="quick-stock-card" onclick="selectItem('YESBANK')">
+                    <span class="quick-stock-symbol">YESBANK</span>
+                    <span class="quick-stock-name">Yes Bank Limited</span>
+                    <span class="quick-stock-badge">Banking</span>
+                </div>
+                <div class="quick-stock-card" onclick="selectItem('ITC')">
+                    <span class="quick-stock-symbol">ITC</span>
+                    <span class="quick-stock-name">ITC Limited</span>
+                    <span class="quick-stock-badge">Conglomerate / FMCG</span>
+                </div>
+            </div>
+
+            <!-- Features Info Grid -->
+            <div class="welcome-section-title">Engine Features</div>
+            <div class="welcome-features-grid">
+                <div class="welcome-feature-card">
+                    <div class="welcome-feature-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>
+                    </div>
+                    <div class="welcome-feature-info">
+                        <span class="welcome-feature-title">AI Recommendation Engine</span>
+                        <span class="welcome-feature-desc">Calculates buying/selling signals based on 5 technical moving averages and momentum oscillators.</span>
+                    </div>
+                </div>
+                <div class="welcome-feature-card">
+                    <div class="welcome-feature-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                    </div>
+                    <div class="welcome-feature-info">
+                        <span class="welcome-feature-title">News Sentiment Scorer</span>
+                        <span class="welcome-feature-desc">Scrapes economic headlines from leading financial platforms and computes compound polarity scores.</span>
+                    </div>
+                </div>
+                <div class="welcome-feature-card">
+                    <div class="welcome-feature-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="9"></line><line x1="9" y1="13" x2="15" y2="13"></line><line x1="9" y1="17" x2="15" y2="17"></line></svg>
+                    </div>
+                    <div class="welcome-feature-info">
+                        <span class="welcome-feature-title">Company Fundamentals</span>
+                        <span class="welcome-feature-desc">Fetches trailing P/E ratios, Price to Book, Beta, YoY revenue growths, and valuation multiples.</span>
+                    </div>
+                </div>
+                <div class="welcome-feature-card">
+                    <div class="welcome-feature-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+                    </div>
+                    <div class="welcome-feature-info">
+                        <span class="welcome-feature-title">MPT Portfolio Optimizer</span>
+                        <span class="welcome-feature-desc">Applies Markowitz Mean-Variance math to discover allocations for Max Sharpe Ratio or Min Volatility.</span>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Dashboard Tab Content (Unified View) -->
@@ -1195,9 +1514,22 @@
                 // Update each index
                 data.forEach(idx => {
                     let elementId = "";
-                    if (idx.index === "NIFTY 50") elementId = "nifty50-val";
-                    else if (idx.index === "NIFTY BANK") elementId = "niftybank-val";
-                    else if (idx.index === "NIFTY NEXT 50") elementId = "niftynext50-val";
+                    let cardValId = "";
+                    let cardChangeId = "";
+                    
+                    if (idx.index === "NIFTY 50") {
+                        elementId = "nifty50-val";
+                        cardValId = "card-nifty50-val";
+                        cardChangeId = "card-nifty50-change";
+                    } else if (idx.index === "NIFTY BANK") {
+                        elementId = "niftybank-val";
+                        cardValId = "card-niftybank-val";
+                        cardChangeId = "card-niftybank-change";
+                    } else if (idx.index === "NIFTY NEXT 50") {
+                        elementId = "niftynext50-val";
+                        cardValId = "card-niftynext50-val";
+                        cardChangeId = "card-niftynext50-change";
+                    }
                     
                     const el = document.getElementById(elementId);
                     if (el) {
@@ -1211,6 +1543,19 @@
                                 ${idx.last.toLocaleString("en-IN", {minimumFractionDigits: 2})} ${arrow} ${changeSign}${idx.variation.toFixed(2)} (${changeSign}${idx.percentChange.toFixed(2)}%)
                             </span>
                         `;
+                    }
+                    
+                    // Welcome landing card indices update
+                    const cardValEl = document.getElementById(cardValId);
+                    const cardChangeEl = document.getElementById(cardChangeId);
+                    if (cardValEl && cardChangeEl) {
+                        const changeSign = idx.variation >= 0 ? "+" : "";
+                        const arrow = idx.variation >= 0 ? "▲" : "▼";
+                        const color = idx.variation >= 0 ? "var(--success-color)" : "var(--danger-color)";
+                        
+                        cardValEl.innerText = "₹ " + idx.last.toLocaleString("en-IN", {minimumFractionDigits: 2});
+                        cardChangeEl.style.color = color;
+                        cardChangeEl.innerHTML = `${arrow} ${changeSign}${idx.variation.toFixed(2)} (${changeSign}${idx.percentChange.toFixed(2)}%)`;
                     }
                 });
             } catch (err) {
