@@ -8,7 +8,7 @@ from pydantic import BaseModel
 from typing import List, Optional
 
 # Import local pipeline modules
-from fetch_prices import fetch_historical_daily, clean_ticker_name
+from fetch_prices import fetch_historical_daily, clean_ticker_name, fetch_live_indices_data, fetch_live_quote
 from fetch_fundamentals import fetch_financial_sheets, fetch_key_valuation_metrics
 from fetch_sentiment import fetch_and_analyze_sentiment
 from indicators import calculate_technical_indicators
@@ -374,6 +374,32 @@ def get_stocks():
         print(f"[-] Failed to cache fallback equity list: {e}")
         
     return fallback_stocks
+
+@app.get("/api/live/indices")
+def get_live_indices():
+    """
+    Returns live market index data (Nifty 50, Nifty Bank, Nifty Next 50).
+    """
+    try:
+        data = fetch_live_indices_data()
+        if not data:
+            raise HTTPException(status_code=500, detail="Failed to fetch live indices data.")
+        return data
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/live/quote/{ticker}")
+def get_live_quote(ticker: str):
+    """
+    Returns live stock price data for the specified ticker.
+    """
+    try:
+        data = fetch_live_quote(ticker)
+        if not data:
+            raise HTTPException(status_code=404, detail=f"Live quote not found for ticker: {ticker}")
+        return data
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/predict/{ticker}")
 def predict(ticker: str):

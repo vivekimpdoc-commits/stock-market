@@ -95,6 +95,23 @@
             100% { transform: scale(0.9); opacity: 0.6; }
         }
 
+        .status-dot.closed {
+            background-color: var(--text-muted) !important;
+            box-shadow: 0 0 8px var(--text-muted) !important;
+        }
+
+        .live-dot-pulse {
+            width: 8px;
+            height: 8px;
+            background-color: var(--success-color);
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 8px var(--success-color);
+            animation: pulse 1.2s infinite;
+            margin-right: 4px;
+            vertical-align: middle;
+        }
+
         /* Main Header */
         header {
             width: 100%;
@@ -879,14 +896,14 @@
     <!-- Official NSE Top Bar -->
     <div class="nse-top-bar">
         <div class="top-bar-content">
-            <div class="index-items">
-                <span class="index-item"><strong>NIFTY 50</strong> <span style="color: var(--success-color); font-weight: 700;">22,040.70 ▲ +110.20 (+0.50%)</span></span>
-                <span class="index-item" style="margin-left: 15px;"><strong>NIFTY BANK</strong> <span style="color: var(--success-color); font-weight: 700;">47,286.40 ▲ +324.15 (+0.69%)</span></span>
-                <span class="index-item" style="margin-left: 15px;"><strong>NIFTY NEXT 50</strong> <span style="color: var(--danger-color); font-weight: 700;">58,120.30 ▼ -45.10 (-0.08%)</span></span>
+            <div class="index-items" id="liveIndicesBar">
+                <span class="index-item" id="nifty50-val"><strong>NIFTY 50</strong> <span style="color: var(--success-color); font-weight: 700;">Loading...</span></span>
+                <span class="index-item" id="niftybank-val" style="margin-left: 15px;"><strong>NIFTY BANK</strong> <span style="color: var(--success-color); font-weight: 700;">Loading...</span></span>
+                <span class="index-item" id="niftynext50-val" style="margin-left: 15px;"><strong>NIFTY NEXT 50</strong> <span style="color: var(--danger-color); font-weight: 700;">Loading...</span></span>
             </div>
-            <div class="market-status">
-                <span class="status-dot"></span>
-                <strong>MARKET STATUS: OPEN</strong>
+            <div class="market-status" id="market-status-container">
+                <span class="status-dot" id="status-dot"></span>
+                <strong id="market-status-val">MARKET STATUS: OPEN</strong>
             </div>
         </div>
     </div>
@@ -956,6 +973,13 @@
                             <tr>
                                 <td>Last Close Price</td>
                                 <td id="infoClose">₹ 2,450.50</td>
+                            </tr>
+                            <tr id="livePriceRow" style="display: none;">
+                                <td>
+                                    <span class="live-dot-pulse"></span>
+                                    Live Price (LTP)
+                                </td>
+                                <td id="infoLivePrice" style="font-weight: 800;">₹ --.--</td>
                             </tr>
                             <tr>
                                 <td>Prediction Date</td>
@@ -1066,6 +1090,110 @@
             ? "http://127.0.0.1:8000"
             : window.location.origin;
         let activeTicker = "";
+        let liveIndicesInterval = null;
+        let liveStockInterval = null;
+
+        function getMarketStatus() {
+            const now = new Date();
+            // Convert to Indian Standard Time (IST, UTC+5:30)
+            const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+            const ist = new Date(utc + (3600000 * 5.5));
+            
+            const day = ist.getDay(); // 0 = Sunday, 6 = Saturday
+            const hours = ist.getHours();
+            const minutes = ist.getMinutes();
+            const timeVal = hours * 100 + minutes;
+            
+            if (day >= 1 && day <= 5 && timeVal >= 915 && timeVal <= 1530) {
+                return "OPEN";
+            }
+            return "CLOSED";
+        }
+
+        async function updateLiveIndices() {
+            try {
+                const response = await fetch(`${API_BASE}/api/live/indices`);
+                if (!response.ok) return;
+                
+                const data = await response.json();
+                
+                // Update Market Status Dot and text based on actual open/closed logic
+                const status = getMarketStatus();
+                const statusDot = document.getElementById("status-dot");
+                const marketStatusVal = document.getElementById("market-status-val");
+                const marketStatusContainer = document.getElementById("market-status-container");
+                
+                if (status === "OPEN") {
+                    if (statusDot) statusDot.classList.remove("closed");
+                    if (marketStatusVal) marketStatusVal.innerText = "MARKET STATUS: OPEN";
+                    if (marketStatusContainer) marketStatusContainer.style.color = "var(--success-color)";
+                } else {
+                    if (statusDot) statusDot.classList.add("closed");
+                    if (marketStatusVal) marketStatusVal.innerText = "MARKET STATUS: CLOSED";
+                    if (marketStatusContainer) marketStatusContainer.style.color = "var(--text-muted)";
+                }
+                
+                // Update each index
+                data.forEach(idx => {
+                    let elementId = "";
+                    if (idx.index === "NIFTY 50") elementId = "nifty50-val";
+                    else if (idx.index === "NIFTY BANK") elementId = "niftybank-val";
+                    else if (idx.index === "NIFTY NEXT 50") elementId = "niftynext50-val";
+                    
+                    const el = document.getElementById(elementId);
+                    if (el) {
+                        const changeSign = idx.variation >= 0 ? "+" : "";
+                        const arrow = idx.variation >= 0 ? "▲" : "▼";
+                        const color = idx.variation >= 0 ? "var(--success-color)" : "var(--danger-color)";
+                        
+                        el.innerHTML = `
+                            <strong>${idx.index}</strong> 
+                            <span style="color: ${color}; font-weight: 700; margin-left: 5px;">
+                                ${idx.last.toLocaleString("en-IN", {minimumFractionDigits: 2})} ${arrow} ${changeSign}${idx.variation.toFixed(2)} (${changeSign}${idx.percentChange.toFixed(2)}%)
+                            </span>
+                        `;
+                    }
+                });
+            } catch (err) {
+                console.error("[-] Error updating live indices:", err);
+            }
+        }
+
+        async function fetchLiveStockPrice(ticker) {
+            try {
+                const response = await fetch(`${API_BASE}/api/live/quote/${ticker}`);
+                if (!response.ok) {
+                    console.warn("Could not retrieve live price.");
+                    return;
+                }
+                const data = await response.json();
+                
+                const livePriceRow = document.getElementById("livePriceRow");
+                const infoLivePrice = document.getElementById("infoLivePrice");
+                
+                if (livePriceRow && infoLivePrice) {
+                    livePriceRow.style.display = "table-row";
+                    
+                    const changeSign = data.change >= 0 ? "+" : "";
+                    const colorVar = data.change >= 0 ? "var(--success-color)" : "var(--danger-color)";
+                    
+                    infoLivePrice.innerHTML = `
+                        <span style="color: var(--text-color); font-weight: 800;">₹ ${data.lastPrice.toLocaleString("en-IN", {minimumFractionDigits: 2})}</span>
+                        <span style="color: ${colorVar}; font-size: 0.85em; margin-left: 8px; font-weight: 600;">
+                            ${changeSign}${data.change.toFixed(2)} (${changeSign}${data.pChange.toFixed(2)}%)
+                        </span>
+                        <span style="font-size: 0.75em; color: var(--text-muted); display: block; font-weight: 400; margin-top: 2px;">
+                            High: ₹${data.dayHigh.toLocaleString("en-IN", {minimumFractionDigits: 2})} | Low: ₹${data.dayLow.toLocaleString("en-IN", {minimumFractionDigits: 2})} | Vol: ${data.volume.toLocaleString("en-IN")}
+                        </span>
+                        <span style="font-size: 0.65em; color: var(--accent-gold); display: block; font-weight: 500; text-transform: uppercase; margin-top: 1px;">
+                            Source: ${data.source}
+                        </span>
+                    `;
+                }
+            } catch (err) {
+                console.error("[-] Error fetching live stock price:", err);
+            }
+        }
 
         // Autocomplete State
         let nseStocksList = [];
@@ -1084,6 +1212,9 @@
             }
         }
         loadStocksList();
+        updateLiveIndices();
+        if (liveIndicesInterval) clearInterval(liveIndicesInterval);
+        liveIndicesInterval = setInterval(updateLiveIndices, 15000);
 
         // Autocomplete controller
         const tickerInput = document.getElementById("tickerInput");
@@ -1225,13 +1356,17 @@
 
         // Hide all views except welcome
         function initDashboard() {
+            if (liveStockInterval) {
+                clearInterval(liveStockInterval);
+                liveStockInterval = null;
+            }
             const contents = document.querySelectorAll(".tab-content");
             contents.forEach(c => c.classList.remove("active"));
             document.getElementById("navTabs").style.display = "none";
             document.getElementById("portfolioResults").style.display = "none";
         }
         initDashboard();
-
+ 
         // Search trigger
         function handleSearch() {
             const input = document.getElementById("tickerInput").value.trim();
@@ -1240,6 +1375,12 @@
                 return;
             }
             activeTicker = input;
+            
+            // Clear any existing stock live price updates interval
+            if (liveStockInterval) {
+                clearInterval(liveStockInterval);
+                liveStockInterval = null;
+            }
             
             // Show Loader, Hide Welcome
             document.getElementById("globalLoader").style.display = "flex";
@@ -1262,6 +1403,11 @@
                 fetchSentiment(activeTicker)
             ]).then(() => {
                 document.getElementById("globalLoader").style.display = "none";
+                // Trigger first live quote update immediately and start interval
+                fetchLiveStockPrice(activeTicker);
+                liveStockInterval = setInterval(() => {
+                    fetchLiveStockPrice(activeTicker);
+                }, 15000);
             }).catch(err => {
                 console.error("Error fetching data:", err);
                 document.getElementById("globalLoader").style.display = "none";
