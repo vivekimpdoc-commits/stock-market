@@ -272,25 +272,23 @@
 
         <div class="gateway-header">
             <h2 id="formTitle">AI System Gateway</h2>
-            <p id="formSubtitle">Secure access to market analytics & forecast engine</p>
+            <p id="formSubtitle">Access market analytics & forecast engine</p>
         </div>
 
-        <form id="gatewayForm" onsubmit="handleSubmit(event)">
+        <div id="gatewayForm">
             <div style="text-align: center; margin: 10px 0 20px 0; font-size: 14px; color: var(--text-muted); line-height: 1.5;">
                 You are entering the guest environment. No sensitive information is collected.
             </div>
 
-            <button type="submit" class="primary-btn" id="submitBtn">
+            <button type="button" class="primary-btn" id="submitBtn" onclick="handleSubmit()">
                 <span class="btn-text" id="submitText">Enter Dashboard</span>
                 <div class="spinner"></div>
             </button>
-        </form>
+        </div>
     </div>
 
     <script>
-        function handleSubmit(e) {
-            e.preventDefault();
-            
+        function handleSubmit() {
             const btn = document.getElementById('submitBtn');
             btn.classList.add('loading');
 
