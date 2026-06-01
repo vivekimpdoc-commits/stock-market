@@ -1369,6 +1369,11 @@
                 <span class="logo-title">NSE India</span>
                 <span class="logo-subtitle">AI Forecasting Pipeline</span>
             </div>
+            <!-- API Connection Indicator -->
+            <div id="api-status-badge" onclick="configureApiUrl()" style="margin-left: 15px; font-size: 11px; padding: 4px 10px; border-radius: 6px; background: rgba(16, 185, 129, 0.15); color: var(--success-color); border: 1px solid rgba(16, 185, 129, 0.3); font-weight: 700; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; transition: all 0.2s;" title="Click to configure backend API URL">
+                <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--success-color); display: inline-block;"></span>
+                Checking API...
+            </div>
         </div>
         <div class="search-container">
             <input type="text" id="tickerInput" placeholder="Enter NSE Ticker (e.g. RELIANCE, TCS)" autocomplete="off">
@@ -1773,10 +1778,86 @@
     </footer>
 
     <script>
-        // API Base URL (FastAPI host) - Dynamically switch between local server and host origin
-        const API_BASE = (window.location.protocol === "file:" || window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
-            ? "http://127.0.0.1:8000"
-            : window.location.origin;
+        // Setup API_BASE dynamically with local storage and status checking
+        let API_BASE = "http://127.0.0.1:8000";
+        const savedApiUrl = localStorage.getItem("custom_api_base");
+        if (savedApiUrl) {
+            API_BASE = savedApiUrl;
+        } else if (window.location.protocol !== "file:" && 
+                   window.location.hostname !== "localhost" && 
+                   window.location.hostname !== "127.0.0.1") {
+            API_BASE = window.location.origin;
+        }
+
+        // Initialize status check
+        async function checkApiConnection() {
+            const badge = document.getElementById("api-status-badge");
+            try {
+                const res = await fetch(`${API_BASE}/status`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.status === "online") {
+                        if (badge) {
+                            badge.style.background = "rgba(16, 185, 129, 0.15)";
+                            badge.style.color = "var(--success-color)";
+                            badge.style.borderColor = "rgba(16, 185, 129, 0.3)";
+                            badge.innerHTML = `<span style="width: 6px; height: 6px; border-radius: 50%; background: var(--success-color); display: inline-block;"></span> API Online`;
+                        }
+                        return;
+                    }
+                }
+            } catch (e) {
+                console.warn("[-] Failed to connect to API base:", API_BASE);
+            }
+
+            // Fallback strategy: if we are remote and fetching origin failed, try localhost
+            if (API_BASE !== "http://127.0.0.1:8000") {
+                console.warn("[*] Falling back to localhost API server.");
+                API_BASE = "http://127.0.0.1:8000";
+                // Verify localhost
+                try {
+                    const res = await fetch(`${API_BASE}/status`);
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data.status === "online") {
+                            if (badge) {
+                                badge.style.background = "rgba(245, 158, 11, 0.15)";
+                                badge.style.color = "var(--accent-gold)";
+                                badge.style.borderColor = "rgba(245, 158, 11, 0.3)";
+                                badge.innerHTML = `<span style="width: 6px; height: 6px; border-radius: 50%; background: var(--accent-gold); display: inline-block;"></span> API: Localhost`;
+                            }
+                            return;
+                        }
+                    }
+                } catch (e) {
+                    console.error("[-] Localhost API offline too.");
+                }
+            }
+
+            // If everything fails
+            if (badge) {
+                badge.style.background = "rgba(239, 68, 68, 0.15)";
+                badge.style.color = "var(--danger-color)";
+                badge.style.borderColor = "rgba(239, 68, 68, 0.3)";
+                badge.innerHTML = `<span style="width: 6px; height: 6px; border-radius: 50%; background: var(--danger-color); display: inline-block;"></span> API Offline (Click to config)`;
+            }
+        }
+
+        function configureApiUrl() {
+            const currentVal = localStorage.getItem("custom_api_base") || API_BASE;
+            const newVal = prompt("Enter your Stock Market AI API URL:\n(e.g., http://127.0.0.1:8000 or https://your-backend.onrender.com)", currentVal);
+            if (newVal !== null) {
+                const cleaned = newVal.trim();
+                if (cleaned) {
+                    localStorage.setItem("custom_api_base", cleaned);
+                    window.location.reload();
+                } else {
+                    localStorage.removeItem("custom_api_base");
+                    window.location.reload();
+                }
+            }
+        }
+
         let activeTicker = "";
         let liveIndicesInterval = null;
         let liveStockInterval = null;
@@ -2277,10 +2358,15 @@
                 console.error("[-] Error loading stock list:", err);
             }
         }
-        loadStocksList();
-        updateLiveIndices();
-        if (liveIndicesInterval) clearInterval(liveIndicesInterval);
-        liveIndicesInterval = setInterval(updateLiveIndices, 15000);
+        
+        async function initApp() {
+            await checkApiConnection();
+            await loadStocksList();
+            await updateLiveIndices();
+            if (liveIndicesInterval) clearInterval(liveIndicesInterval);
+            liveIndicesInterval = setInterval(updateLiveIndices, 15000);
+        }
+        initApp();
 
         // Autocomplete controller
         const tickerInput = document.getElementById("tickerInput");

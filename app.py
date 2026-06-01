@@ -20,6 +20,16 @@ app = FastAPI(
     version="1.0.0"
 )
 
+# Configure CORS middleware
+from fastapi.middleware.cors import CORSMiddleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # Helper function to convert input ticker to standard NSE format
 def normalize_ticker(ticker: str) -> str:
     ticker = ticker.strip().upper()
