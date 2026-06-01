@@ -418,17 +418,27 @@ def get_fundamentals(ticker: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/history/{ticker}")
-def get_history(ticker: str):
+def get_history(ticker: str, period: str = "1m"):
     """
-    Returns historical price series for the last 30 trading days.
+    Returns historical price series for the specified period.
+    period: '1m' (30 days), '3m' (90 days), '6m' (180 days), '1y' (365 days)
     """
     normalized = normalize_ticker(ticker)
     clean_name = clean_ticker_name(normalized)
     
+    # Map period string to number of days
+    period_map = {
+        "1m": 30,
+        "3m": 90,
+        "6m": 180,
+        "1y": 365
+    }
+    days = period_map.get(period.lower(), 30)
+    
     price_file = os.path.join("data", f"{clean_name}_daily_prices.csv")
     try:
         if not os.path.exists(price_file):
-            df = fetch_historical_daily(normalized, start_date="2024-01-01")
+            df = fetch_historical_daily(normalized, start_date="2023-01-01")
         else:
             df = pd.read_csv(price_file)
             
@@ -439,8 +449,8 @@ def get_history(ticker: str):
         df['Date'] = pd.to_datetime(df['Date'])
         df = df.sort_values('Date')
         
-        # Take the last 30 trading days
-        recent_df = df.tail(30)
+        # Take last N trading days
+        recent_df = df.tail(days)
         
         history_list = []
         for _, row in recent_df.iterrows():
@@ -448,11 +458,125 @@ def get_history(ticker: str):
             history_list.append({
                 "date": date_str,
                 "close": float(row['Close']),
+                "open": float(row['Open']) if not pd.isna(row['Open']) else None,
+                "high": float(row['High']) if not pd.isna(row['High']) else None,
+                "low": float(row['Low']) if not pd.isna(row['Low']) else None,
                 "volume": int(row['Volume']) if not pd.isna(row['Volume']) else 0
             })
         return history_list
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/technicals/{ticker}")
+def get_technicals(ticker: str):
+    """
+    Returns the latest technical indicator values and signals for the specified ticker.
+    Includes RSI, MACD, SMA50, SMA200, EMA20 with bullish/bearish signal labels.
+    """
+    normalized = normalize_ticker(ticker)
+    clean_name = clean_ticker_name(normalized)
+
+    try:
+        price_file = os.path.join("data", f"{clean_name}_daily_prices.csv")
+        if not os.path.exists(price_file):
+            df = fetch_historical_daily(normalized, start_date="2023-01-01")
+        
+        indicators_df = calculate_technical_indicators(price_file)
+        if indicators_df is None or indicators_df.empty:
+            raise HTTPException(status_code=404, detail="Could not compute technical indicators.")
+        
+        row = indicators_df.iloc[-1].copy()
+        
+        def safe_float(val):
+            try:
+                v = float(val)
+                return round(v, 4) if not np.isnan(v) else None
+            except Exception:
+                return None
+        
+        close = safe_float(row.get('Close'))
+        sma50 = safe_float(row.get('SMA_50'))
+        sma200 = safe_float(row.get('SMA_200'))
+        ema20 = safe_float(row.get('EMA_20'))
+        rsi14 = safe_float(row.get('RSI_14'))
+        macd = safe_float(row.get('MACD_12_26_9'))
+        macd_signal = safe_float(row.get('MACDs_12_26_9'))
+        macd_hist = safe_float(row.get('MACDh_12_26_9'))
+        bbup = safe_float(row.get('BBU_20_2.0'))
+        bbmid = safe_float(row.get('BBM_20_2.0'))
+        bblow = safe_float(row.get('BBL_20_2.0'))
+        
+        # Derive signals
+        signals = []
+        
+        if close and sma50:
+            signals.append({
+                "name": "Price vs SMA50",
+                "value": f"₹{close:,.2f} vs ₹{sma50:,.2f}",
+                "signal": "Bullish" if close > sma50 else "Bearish",
+                "description": "Price above SMA50 is bullish" if close > sma50 else "Price below SMA50 is bearish"
+            })
+        
+        if sma50 and sma200:
+            signals.append({
+                "name": "Golden/Death Cross",
+                "value": f"SMA50: ₹{sma50:,.2f} | SMA200: ₹{sma200:,.2f}",
+                "signal": "Golden Cross (Bullish)" if sma50 > sma200 else "Death Cross (Bearish)",
+                "description": "SMA50 > SMA200 = Golden Cross (strong bullish)" if sma50 > sma200 else "SMA50 < SMA200 = Death Cross (strong bearish)"
+            })
+        
+        if rsi14 is not None:
+            rsi_signal = "Overbought" if rsi14 > 70 else ("Oversold" if rsi14 < 30 else ("Bullish" if rsi14 > 50 else "Bearish"))
+            signals.append({
+                "name": "RSI (14)",
+                "value": f"{rsi14:.2f}",
+                "signal": rsi_signal,
+                "description": "RSI > 70 = Overbought, < 30 = Oversold, > 50 = Bullish momentum"
+            })
+        
+        if macd is not None and macd_signal is not None:
+            signals.append({
+                "name": "MACD (12,26,9)",
+                "value": f"MACD: {macd:.4f} | Signal: {macd_signal:.4f}",
+                "signal": "Bullish Crossover" if macd > macd_signal else "Bearish Crossover",
+                "description": "MACD > Signal line is bullish, below is bearish"
+            })
+        
+        if close and bbup and bblow:
+            if close > bbup:
+                bb_signal = "Overbought"
+            elif close < bblow:
+                bb_signal = "Oversold (Potential Reversal)"
+            else:
+                bb_signal = "Within Bands"
+            signals.append({
+                "name": "Bollinger Bands",
+                "value": f"Upper: ₹{bbup:,.2f} | Lower: ₹{bblow:,.2f}",
+                "signal": bb_signal,
+                "description": "Price outside bands indicates potential reversal"
+            })
+        
+        return {
+            "ticker": normalized,
+            "clean_name": clean_name,
+            "date": str(row.get('Date', '')),
+            "values": {
+                "close": close,
+                "sma50": sma50,
+                "sma200": sma200,
+                "ema20": ema20,
+                "rsi14": rsi14,
+                "macd": macd,
+                "macd_signal": macd_signal,
+                "macd_hist": macd_hist,
+                "bb_upper": bbup,
+                "bb_middle": bbmid,
+                "bb_lower": bblow,
+            },
+            "signals": signals
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Technical indicators error: {e}")
 
 @app.get("/predict/{ticker}")
 def predict(ticker: str):
