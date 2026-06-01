@@ -537,8 +537,10 @@
             setTimeout(() => {
                 btn.classList.remove('loading');
                 if (isLoginMode) {
-                    // Navigate to dashboard
-                    window.location.href = "/";
+                    // Set login state
+                    localStorage.setItem("isLoggedIn", "true");
+                    // Navigate to dashboard using relative path for GitHub Pages compatibility
+                    window.location.href = "index.html";
                 } else {
                     alert("Account created successfully! Please login.");
                     toggleMode();

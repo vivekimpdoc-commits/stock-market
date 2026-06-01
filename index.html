@@ -1375,10 +1375,17 @@
                 Checking API...
             </div>
         </div>
-        <div class="search-container">
-            <input type="text" id="tickerInput" placeholder="Enter NSE Ticker (e.g. RELIANCE, TCS)" autocomplete="off">
-            <button onclick="handleSearch()">Search</button>
-            <div id="autocompleteDropdown" class="autocomplete-dropdown"></div>
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <div class="search-container">
+                <input type="text" id="tickerInput" placeholder="Enter NSE Ticker (e.g. RELIANCE, TCS)" autocomplete="off">
+                <button onclick="handleSearch()">Search</button>
+                <div id="autocompleteDropdown" class="autocomplete-dropdown"></div>
+            </div>
+            <!-- Logout Button -->
+            <button onclick="handleLogout()" style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.25); color: var(--danger-color); padding: 10px 18px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 14px; font-family: inherit; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px;" onmouseover="this.style.background='rgba(239, 68, 68, 0.2)';" onmouseout="this.style.background='rgba(239, 68, 68, 0.1)';">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                Logout
+            </button>
         </div>
     </header>
 
@@ -1778,6 +1785,16 @@
     </footer>
 
     <script>
+        // Check if user is logged in
+        if (localStorage.getItem("isLoggedIn") !== "true") {
+            window.location.href = "login.html";
+        }
+
+        function handleLogout() {
+            localStorage.removeItem("isLoggedIn");
+            window.location.href = "login.html";
+        }
+
         // Setup API_BASE dynamically with local storage and status checking
         let API_BASE = "http://127.0.0.1:8000";
         const savedApiUrl = localStorage.getItem("custom_api_base");
