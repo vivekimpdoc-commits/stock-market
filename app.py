@@ -55,6 +55,10 @@ def read_index():
             return HTMLResponse(content=f.read())
     return HTMLResponse(content="<h1>index.html dashboard file not found!</h1>", status_code=404)
 
+@app.get("/index.html", response_class=HTMLResponse)
+def read_index_html():
+    return read_index()
+
 @app.get("/login", response_class=HTMLResponse)
 def read_login():
     """
@@ -65,6 +69,10 @@ def read_login():
         with open(login_path, "r", encoding="utf-8") as f:
             return HTMLResponse(content=f.read())
     return HTMLResponse(content="<h1>login.html file not found!</h1>", status_code=404)
+
+@app.get("/login.html", response_class=HTMLResponse)
+def read_login_html():
+    return read_login()
 
 @app.get("/status")
 def status():
