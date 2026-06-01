@@ -151,6 +151,160 @@
             color: var(--text-color);
         }
 
+        /* Chart period selector */
+        .chart-period-btns {
+            display: flex;
+            gap: 6px;
+        }
+        .chart-period-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-muted);
+            padding: 5px 14px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+        .chart-period-btn:hover {
+            background: rgba(59, 130, 246, 0.12);
+            border-color: rgba(59, 130, 246, 0.3);
+            color: var(--text-color);
+        }
+        .chart-period-btn.active {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: var(--accent-blue);
+            color: white;
+            box-shadow: 0 0 10px rgba(59,130,246,0.2);
+        }
+
+        /* Technical Indicators Panel */
+        .technicals-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .technical-signal-card {
+            background: rgba(0,0,0,0.15);
+            border: 1px solid rgba(255,255,255,0.04);
+            border-radius: 10px;
+            padding: 14px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .technical-signal-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 3px;
+            height: 100%;
+            border-radius: 3px 0 0 3px;
+        }
+        .technical-signal-card.bullish::before { background: var(--success-color); }
+        .technical-signal-card.bearish::before { background: var(--danger-color); }
+        .technical-signal-card.neutral::before { background: var(--accent-gold); }
+        .technical-signal-card:hover {
+            background: rgba(255,255,255,0.02);
+            transform: translateY(-2px);
+        }
+        .technical-signal-name {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--text-muted);
+        }
+        .technical-signal-value {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+        .technical-signal-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            width: fit-content;
+        }
+        .signal-bullish { background: rgba(16,185,129,0.15); color: var(--success-color); border: 1px solid rgba(16,185,129,0.3); }
+        .signal-bearish { background: rgba(239,68,68,0.15); color: var(--danger-color); border: 1px solid rgba(239,68,68,0.3); }
+        .signal-neutral { background: rgba(245,158,11,0.15); color: var(--accent-gold); border: 1px solid rgba(245,158,11,0.3); }
+
+        /* RSI Gauge */
+        .rsi-gauge-wrap {
+            margin-top: 8px;
+        }
+        .rsi-gauge-bg {
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(90deg, #10b981 0%, #f59e0b 50%, #ef4444 100%);
+            border-radius: 4px;
+            position: relative;
+            overflow: visible;
+        }
+        .rsi-gauge-needle {
+            position: absolute;
+            top: -4px;
+            width: 4px;
+            height: 16px;
+            background: white;
+            border-radius: 2px;
+            box-shadow: 0 0 6px rgba(255,255,255,0.8);
+            transform: translateX(-50%);
+            transition: left 1s cubic-bezier(0.4,0,0.2,1);
+        }
+        .rsi-gauge-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 9px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* Market summary stat bar */
+        .stat-summary-bar {
+            display: flex;
+            gap: 0;
+            background: rgba(0,0,0,0.15);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .stat-summary-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 14px 10px;
+            border-right: 1px solid rgba(255,255,255,0.04);
+            transition: background 0.2s;
+        }
+        .stat-summary-item:last-child { border-right: none; }
+        .stat-summary-item:hover { background: rgba(255,255,255,0.02); }
+        .stat-summary-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .stat-summary-value {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--text-color);
+        }
+
         /* Main Header */
         header {
             width: 100%;
@@ -1303,13 +1457,23 @@
         <!-- Dashboard Tab Content (Unified View) -->
         <div id="dashboard-tab" class="tab-content">
             <!-- Price Chart Card -->
-            <div class="glass-panel" id="chartCard" style="display: none; margin-bottom: 25px; min-height: 380px; position: relative;">
-                <h3 style="margin-bottom: 15px; font-size: 22px; display: flex; align-items: center; justify-content: space-between;">
-                    <span>30-Day Price Trend</span>
-                    <span id="chartTickerLabel" style="color: var(--accent-gold); font-size: 14px; font-weight: 700;"></span>
-                </h3>
-                <div style="width: 100%; height: 300px; position: relative;">
+            <div class="glass-panel" id="chartCard" style="display: none; margin-bottom: 25px; position: relative;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
+                    <h3 style="font-size: 20px; margin-bottom: 0; border-bottom: none; padding-bottom: 0;">Price Trend <span id="chartTickerLabel" style="color: var(--accent-gold); font-size: 14px; font-weight: 700; margin-left: 8px;"></span></h3>
+                    <div class="chart-period-btns" id="chartPeriodBtns">
+                        <button class="chart-period-btn active" onclick="changePeriod('1m', this)">1M</button>
+                        <button class="chart-period-btn" onclick="changePeriod('3m', this)">3M</button>
+                        <button class="chart-period-btn" onclick="changePeriod('6m', this)">6M</button>
+                        <button class="chart-period-btn" onclick="changePeriod('1y', this)">1Y</button>
+                    </div>
+                </div>
+                <!-- Price line chart -->
+                <div style="width: 100%; height: 280px; position: relative;">
                     <canvas id="priceChart"></canvas>
+                </div>
+                <!-- Volume bar chart -->
+                <div style="width: 100%; height: 70px; position: relative; margin-top: 8px; opacity: 0.7;">
+                    <canvas id="volumeChart"></canvas>
                 </div>
             </div>
             
@@ -1362,8 +1526,32 @@
                     </div>
                 </div>
 
-                <!-- Right Column (Sentiment & Fundamentals) -->
+                <!-- Right Column (Sentiment, Fundamentals, Technicals) -->
                 <div class="dashboard-column">
+                    <!-- Technical Indicators Card -->
+                    <div class="glass-panel" id="technicalsCard" style="display: none;">
+                        <h3 style="margin-bottom: 5px; font-size: 18px;">Technical Indicators</h3>
+                        <div id="technicalsDate" style="color: var(--text-muted); font-size: 12px; margin-bottom: 15px;">As of --</div>
+                        <!-- RSI Gauge -->
+                        <div id="rsiGaugeWrap" class="rsi-gauge-wrap" style="display: none; margin-bottom: 18px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                                <span style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: var(--text-muted);">RSI (14) Gauge</span>
+                                <span id="rsiGaugeValue" style="font-size: 13px; font-weight: 800; color: var(--text-color);">--</span>
+                            </div>
+                            <div class="rsi-gauge-bg">
+                                <div class="rsi-gauge-needle" id="rsiNeedle" style="left: 50%;"></div>
+                            </div>
+                            <div class="rsi-gauge-labels">
+                                <span>Oversold (30)</span>
+                                <span>Neutral (50)</span>
+                                <span>Overbought (70)</span>
+                            </div>
+                        </div>
+                        <div class="technicals-grid" id="technicalsContainer">
+                            <!-- Injected dynamically -->
+                        </div>
+                    </div>
+
                     <div class="glass-panel" id="fundamentalsCard" style="display: none;">
                         <h3 style="margin-bottom: 5px; font-size: 22px;">Company Fundamentals</h3>
                         <div id="companyLongName" style="color: var(--accent-gold); font-size: 13px; font-weight: 700; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 0.5px;">Company Name</div>
@@ -1470,6 +1658,8 @@
         let liveIndicesInterval = null;
         let liveStockInterval = null;
         let priceChartInstance = null;
+        let volumeChartInstance = null;
+        let activePeriod = "1m";
 
         function getMarketStatus() {
             const now = new Date();
@@ -1722,9 +1912,10 @@
             return "₹ " + n.toLocaleString("en-IN");
         }
 
-        async function fetchAndRenderChart(ticker) {
+        async function fetchAndRenderChart(ticker, period) {
+            period = period || activePeriod || '1m';
             try {
-                const response = await fetch(`${API_BASE}/api/history/${ticker}`);
+                const response = await fetch(`${API_BASE}/api/history/${ticker}?period=${period}`);
                 const card = document.getElementById("chartCard");
                 if (!response.ok) {
                     if (card) card.style.display = "none";
@@ -1742,35 +1933,56 @@
                 if (labelTicker) labelTicker.innerText = ticker.toUpperCase();
                 
                 const labels = data.map(d => {
-                    const dateObj = new Date(d.date);
+                    const dateObj = new Date(d.date + 'T00:00:00');
+                    if (period === '1y' || period === '6m') {
+                        return dateObj.toLocaleDateString("en-IN", { month: 'short', year: '2-digit' });
+                    }
                     return dateObj.toLocaleDateString("en-IN", { day: '2-digit', month: 'short' });
                 });
                 const prices = data.map(d => d.close);
+                const volumes = data.map(d => d.volume || 0);
                 
+                // Determine chart color based on price trend
+                const firstPrice = prices[0];
+                const lastPrice = prices[prices.length - 1];
+                const isUp = lastPrice >= firstPrice;
+                const lineColor = isUp ? '#10b981' : '#ef4444';
+                const gradTop = isUp ? 'rgba(16, 185, 129, 0.30)' : 'rgba(239, 68, 68, 0.30)';
+                const gradBot = isUp ? 'rgba(16, 185, 129, 0.00)' : 'rgba(239, 68, 68, 0.00)';
+
+                // --- Price Chart ---
                 const ctx = document.getElementById("priceChart").getContext("2d");
+                if (priceChartInstance) { priceChartInstance.destroy(); }
                 
-                if (priceChartInstance) {
-                    priceChartInstance.destroy();
-                }
+                const gradient = ctx.createLinearGradient(0, 0, 0, 280);
+                gradient.addColorStop(0, gradTop);
+                gradient.addColorStop(1, gradBot);
                 
-                // Create linear gradient for beautiful shadow effect
-                const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-                gradient.addColorStop(0, "rgba(59, 130, 246, 0.35)");
-                gradient.addColorStop(1, "rgba(59, 130, 246, 0.00)");
+                const chartTooltipOptions = {
+                    backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                    titleColor: '#f8fafc',
+                    bodyColor: '#f8fafc',
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                    borderWidth: 1,
+                    padding: 12,
+                    displayColors: false,
+                    titleFont: { family: 'Outfit', size: 13, weight: '600' },
+                    bodyFont: { family: 'Outfit', size: 14, weight: '800' }
+                };
                 
                 priceChartInstance = new Chart(ctx, {
                     type: 'line',
                     data: {
                         labels: labels,
                         datasets: [{
-                            label: 'Closing Price (₹)',
+                            label: 'Close (₹)',
                             data: prices,
-                            borderColor: '#3b82f6',
-                            borderWidth: 3,
-                            pointBackgroundColor: '#3b82f6',
-                            pointBorderColor: 'rgba(255, 255, 255, 0.8)',
+                            borderColor: lineColor,
+                            borderWidth: 2.5,
+                            pointBackgroundColor: lineColor,
+                            pointBorderColor: 'rgba(255,255,255,0.7)',
                             pointBorderWidth: 1.5,
-                            pointRadius: 3,
+                            pointRadius: prices.length > 90 ? 0 : 3,
                             pointHoverRadius: 6,
                             pointHoverBackgroundColor: '#f59e0b',
                             pointHoverBorderColor: '#ffffff',
@@ -1783,72 +1995,145 @@
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
+                        interaction: { mode: 'index', intersect: false },
                         plugins: {
-                            legend: {
-                                display: false
-                            },
+                            legend: { display: false },
                             tooltip: {
-                                backgroundColor: 'rgba(15, 23, 42, 0.9)',
-                                titleColor: '#f8fafc',
-                                bodyColor: '#f8fafc',
-                                borderColor: 'rgba(255, 255, 255, 0.1)',
-                                borderWidth: 1,
-                                padding: 12,
-                                displayColors: false,
+                                ...chartTooltipOptions,
                                 callbacks: {
-                                    label: function(context) {
-                                        return `Price: ₹ ${context.parsed.y.toLocaleString("en-IN", {minimumFractionDigits: 2})}`;
-                                    }
-                                },
-                                titleFont: {
-                                    family: 'Outfit',
-                                    size: 13,
-                                    weight: '600'
-                                },
-                                bodyFont: {
-                                    family: 'Outfit',
-                                    size: 14,
-                                    weight: '800'
+                                    label: ctx => `Close: ₹${ctx.parsed.y.toLocaleString('en-IN', {minimumFractionDigits: 2})}`
                                 }
                             }
                         },
                         scales: {
                             x: {
-                                grid: {
-                                    color: 'rgba(255, 255, 255, 0.04)',
-                                    drawBorder: false
-                                },
-                                ticks: {
-                                    color: '#94a3b8',
-                                    font: {
-                                        family: 'Outfit',
-                                        size: 11
-                                    },
-                                    maxTicksLimit: 10
-                                }
+                                grid: { color: 'rgba(255,255,255,0.03)', drawBorder: false },
+                                ticks: { color: '#94a3b8', font: { family: 'Outfit', size: 10 }, maxTicksLimit: 10 }
                             },
                             y: {
-                                grid: {
-                                    color: 'rgba(255, 255, 255, 0.04)',
-                                    drawBorder: false
-                                },
+                                grid: { color: 'rgba(255,255,255,0.03)', drawBorder: false },
                                 ticks: {
-                                    color: '#94a3b8',
-                                    font: {
-                                        family: 'Outfit',
-                                        size: 11
-                                    },
-                                    callback: function(value) {
-                                        return '₹' + value.toLocaleString("en-IN");
-                                    }
+                                    color: '#94a3b8', font: { family: 'Outfit', size: 10 },
+                                    callback: v => '₹' + v.toLocaleString('en-IN')
                                 }
                             }
                         }
                     }
                 });
+
+                // --- Volume Chart ---
+                const vctx = document.getElementById("volumeChart").getContext("2d");
+                if (volumeChartInstance) { volumeChartInstance.destroy(); }
+
+                volumeChartInstance = new Chart(vctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Volume',
+                            data: volumes,
+                            backgroundColor: volumes.map((v, i) => {
+                                if (i === 0) return 'rgba(100,116,139,0.5)';
+                                return prices[i] >= prices[i-1] ? 'rgba(16,185,129,0.5)' : 'rgba(239,68,68,0.5)';
+                            }),
+                            borderWidth: 0,
+                            borderRadius: 1,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                ...chartTooltipOptions,
+                                callbacks: {
+                                    label: ctx => `Volume: ${ctx.parsed.y.toLocaleString('en-IN')}`
+                                }
+                            }
+                        },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+
             } catch (err) {
                 console.error("[-] Error loading chart:", err);
                 const card = document.getElementById("chartCard");
+                if (card) card.style.display = "none";
+            }
+        }
+
+        function changePeriod(period, btn) {
+            activePeriod = period;
+            // Update button styles
+            document.querySelectorAll('.chart-period-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            // Re-render chart with new period
+            if (activeTicker) fetchAndRenderChart(activeTicker, period);
+        }
+
+        async function fetchAndRenderTechnicals(ticker) {
+            try {
+                const response = await fetch(`${API_BASE}/api/technicals/${ticker}`);
+                const card = document.getElementById("technicalsCard");
+                const container = document.getElementById("technicalsContainer");
+                if (!response.ok) {
+                    if (card) card.style.display = "none";
+                    return;
+                }
+                const data = await response.json();
+                if (!data || !data.signals || data.signals.length === 0) {
+                    if (card) card.style.display = "none";
+                    return;
+                }
+                
+                if (card) card.style.display = "block";
+                
+                const dateEl = document.getElementById("technicalsDate");
+                if (dateEl) dateEl.innerText = `As of ${data.date || '--'}`;
+                
+                // RSI Gauge
+                const rsi = data.values && data.values.rsi14;
+                if (rsi !== null && rsi !== undefined) {
+                    const rsiGaugeWrap = document.getElementById("rsiGaugeWrap");
+                    if (rsiGaugeWrap) rsiGaugeWrap.style.display = "block";
+                    const rsiVal = document.getElementById("rsiGaugeValue");
+                    if (rsiVal) {
+                        const rsiLabel = rsi > 70 ? 'Overbought' : (rsi < 30 ? 'Oversold' : 'Neutral');
+                        const rsiColor = rsi > 70 ? '#ef4444' : (rsi < 30 ? '#10b981' : '#f59e0b');
+                        rsiVal.innerHTML = `<span style="color:${rsiColor};">${rsi.toFixed(1)} — ${rsiLabel}</span>`;
+                    }
+                    const needle = document.getElementById("rsiNeedle");
+                    if (needle) needle.style.left = `${Math.min(Math.max(rsi, 0), 100)}%`;
+                }
+                
+                // Signals grid
+                if (container) {
+                    container.innerHTML = "";
+                    data.signals.forEach(sig => {
+                        const sigLower = sig.signal.toLowerCase();
+                        let cls = 'neutral';
+                        let badgeCls = 'signal-neutral';
+                        if (sigLower.includes('bull') || sigLower.includes('golden') || sigLower.includes('oversold')) {
+                            cls = 'bullish'; badgeCls = 'signal-bullish';
+                        } else if (sigLower.includes('bear') || sigLower.includes('death') || sigLower.includes('overbought')) {
+                            cls = 'bearish'; badgeCls = 'signal-bearish';
+                        }
+                        container.innerHTML += `
+                            <div class="technical-signal-card ${cls}" title="${sig.description}">
+                                <span class="technical-signal-name">${sig.name}</span>
+                                <span class="technical-signal-value">${sig.value}</span>
+                                <span class="technical-signal-badge ${badgeCls}">${sig.signal}</span>
+                            </div>
+                        `;
+                    });
+                }
+            } catch (err) {
+                console.error("[-] Error fetching technicals:", err);
+                const card = document.getElementById("technicalsCard");
                 if (card) card.style.display = "none";
             }
         }
@@ -2025,10 +2310,13 @@
             
             const chartCard = document.getElementById("chartCard");
             if (chartCard) chartCard.style.display = "none";
-            if (priceChartInstance) {
-                priceChartInstance.destroy();
-                priceChartInstance = null;
-            }
+            if (priceChartInstance) { priceChartInstance.destroy(); priceChartInstance = null; }
+            if (volumeChartInstance) { volumeChartInstance.destroy(); volumeChartInstance = null; }
+            const techCard = document.getElementById("technicalsCard");
+            if (techCard) techCard.style.display = "none";
+            // Reset period buttons
+            activePeriod = '1m';
+            document.querySelectorAll('.chart-period-btn').forEach((b, i) => b.classList.toggle('active', i === 0));
         }
         initDashboard();
  
@@ -2062,12 +2350,13 @@
             document.getElementById("dashboard-tab").classList.add("active");
             tablinks[0].classList.add("active");
             
-            // Fetch Predict, Sentiment, Fundamentals, and Chart data in parallel
+            // Fetch Predict, Sentiment, Fundamentals, Chart, and Technicals data in parallel
             Promise.all([
                 fetchPrediction(activeTicker),
                 fetchSentiment(activeTicker),
                 fetchFundamentals(activeTicker),
-                fetchAndRenderChart(activeTicker)
+                fetchAndRenderChart(activeTicker, activePeriod),
+                fetchAndRenderTechnicals(activeTicker)
             ]).then(() => {
                 document.getElementById("globalLoader").style.display = "none";
                 // Trigger first live quote update immediately and start interval
