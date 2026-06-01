@@ -1531,16 +1531,39 @@
                         cardChangeId = "card-niftynext50-change";
                     }
                     
+                    // Parse values safely to prevent JS execution errors on null/strings/undefined
+                    const rawLast = idx.last;
+                    const rawVariation = idx.variation;
+                    const rawPercentChange = idx.percentChange;
+                    
+                    // Clean and convert to number if it is a string with commas
+                    const cleanNum = (val) => {
+                        if (val === null || val === undefined) return NaN;
+                        if (typeof val === 'number') return val;
+                        // Replace commas and convert to float
+                        const cleaned = String(val).replace(/,/g, '');
+                        return parseFloat(cleaned);
+                    };
+                    
+                    const numLast = cleanNum(rawLast);
+                    const numVariation = cleanNum(rawVariation);
+                    const numPercent = cleanNum(rawPercentChange);
+                    
+                    const lastStr = isNaN(numLast) ? String(rawLast || "--") : numLast.toLocaleString("en-IN", {minimumFractionDigits: 2});
+                    const variationStr = isNaN(numVariation) ? String(rawVariation || "--") : numVariation.toFixed(2);
+                    const percentStr = isNaN(numPercent) ? String(rawPercentChange || "--") : numPercent.toFixed(2);
+                    
+                    const isPositive = isNaN(numVariation) ? true : (numVariation >= 0);
+                    const changeSign = isPositive ? "+" : "";
+                    const arrow = isPositive ? "▲" : "▼";
+                    const color = isPositive ? "var(--success-color)" : "var(--danger-color)";
+                    
                     const el = document.getElementById(elementId);
                     if (el) {
-                        const changeSign = idx.variation >= 0 ? "+" : "";
-                        const arrow = idx.variation >= 0 ? "▲" : "▼";
-                        const color = idx.variation >= 0 ? "var(--success-color)" : "var(--danger-color)";
-                        
                         el.innerHTML = `
                             <strong>${idx.index}</strong> 
                             <span style="color: ${color}; font-weight: 700; margin-left: 5px;">
-                                ${idx.last.toLocaleString("en-IN", {minimumFractionDigits: 2})} ${arrow} ${changeSign}${idx.variation.toFixed(2)} (${changeSign}${idx.percentChange.toFixed(2)}%)
+                                ${lastStr} ${arrow} ${changeSign}${variationStr} (${changeSign}${percentStr}%)
                             </span>
                         `;
                     }
@@ -1549,13 +1572,9 @@
                     const cardValEl = document.getElementById(cardValId);
                     const cardChangeEl = document.getElementById(cardChangeId);
                     if (cardValEl && cardChangeEl) {
-                        const changeSign = idx.variation >= 0 ? "+" : "";
-                        const arrow = idx.variation >= 0 ? "▲" : "▼";
-                        const color = idx.variation >= 0 ? "var(--success-color)" : "var(--danger-color)";
-                        
-                        cardValEl.innerText = "₹ " + idx.last.toLocaleString("en-IN", {minimumFractionDigits: 2});
+                        cardValEl.innerText = "₹ " + lastStr;
                         cardChangeEl.style.color = color;
-                        cardChangeEl.innerHTML = `${arrow} ${changeSign}${idx.variation.toFixed(2)} (${changeSign}${idx.percentChange.toFixed(2)}%)`;
+                        cardChangeEl.innerHTML = `${arrow} ${changeSign}${variationStr} (${changeSign}${percentStr}%)`;
                     }
                 });
             } catch (err) {
@@ -1578,19 +1597,42 @@
                 if (livePriceRow && infoLivePrice) {
                     livePriceRow.style.display = "table-row";
                     
-                    const changeSign = data.change >= 0 ? "+" : "";
-                    const colorVar = data.change >= 0 ? "var(--success-color)" : "var(--danger-color)";
+                    // Parse values safely to prevent JS execution errors
+                    const cleanNum = (val) => {
+                        if (val === null || val === undefined) return NaN;
+                        if (typeof val === 'number') return val;
+                        const cleaned = String(val).replace(/,/g, '');
+                        return parseFloat(cleaned);
+                    };
+                    
+                    const lastPrice = cleanNum(data.lastPrice);
+                    const change = cleanNum(data.change);
+                    const pChange = cleanNum(data.pChange);
+                    const dayHigh = cleanNum(data.dayHigh);
+                    const dayLow = cleanNum(data.dayLow);
+                    const volume = cleanNum(data.volume);
+                    
+                    const lastStr = isNaN(lastPrice) ? String(data.lastPrice || "--") : lastPrice.toLocaleString("en-IN", {minimumFractionDigits: 2});
+                    const changeStr = isNaN(change) ? String(data.change || "--") : change.toFixed(2);
+                    const pChangeStr = isNaN(pChange) ? String(data.pChange || "--") : pChange.toFixed(2);
+                    const dayHighStr = isNaN(dayHigh) ? String(data.dayHigh || "--") : dayHigh.toLocaleString("en-IN", {minimumFractionDigits: 2});
+                    const dayLowStr = isNaN(dayLow) ? String(data.dayLow || "--") : dayLow.toLocaleString("en-IN", {minimumFractionDigits: 2});
+                    const volumeStr = isNaN(volume) ? String(data.volume || "--") : volume.toLocaleString("en-IN");
+                    
+                    const isPositive = isNaN(change) ? true : (change >= 0);
+                    const changeSign = isPositive ? "+" : "";
+                    const colorVar = isPositive ? "var(--success-color)" : "var(--danger-color)";
                     
                     infoLivePrice.innerHTML = `
-                        <span style="color: var(--text-color); font-weight: 800;">₹ ${data.lastPrice.toLocaleString("en-IN", {minimumFractionDigits: 2})}</span>
+                        <span style="color: var(--text-color); font-weight: 800;">₹ ${lastStr}</span>
                         <span style="color: ${colorVar}; font-size: 0.85em; margin-left: 8px; font-weight: 600;">
-                            ${changeSign}${data.change.toFixed(2)} (${changeSign}${data.pChange.toFixed(2)}%)
+                            ${changeSign}${changeStr} (${changeSign}${pChangeStr}%)
                         </span>
                         <span style="font-size: 0.75em; color: var(--text-muted); display: block; font-weight: 400; margin-top: 2px;">
-                            High: ₹${data.dayHigh.toLocaleString("en-IN", {minimumFractionDigits: 2})} | Low: ₹${data.dayLow.toLocaleString("en-IN", {minimumFractionDigits: 2})} | Vol: ${data.volume.toLocaleString("en-IN")}
+                            High: ₹${dayHighStr} | Low: ₹${dayLowStr} | Vol: ${volumeStr}
                         </span>
                         <span style="font-size: 0.65em; color: var(--accent-gold); display: block; font-weight: 500; text-transform: uppercase; margin-top: 1px;">
-                            Source: ${data.source}
+                            Source: ${data.source || "Unknown"}
                         </span>
                     `;
                 }
@@ -1620,14 +1662,29 @@
                         nameHeader.innerText = data["Long Name"] || ticker;
                     }
                     
+                    const cleanNum = (val) => {
+                        if (val === null || val === undefined) return NaN;
+                        if (typeof val === 'number') return val;
+                        const cleaned = String(val).replace(/,/g, '');
+                        return parseFloat(cleaned);
+                    };
+
+                    const parseField = (val, isPercentage = false) => {
+                        const n = cleanNum(val);
+                        if (isNaN(n)) return "N/A";
+                        const factor = isPercentage ? 100 : 1;
+                        const formatted = (n * factor).toFixed(2);
+                        return isPercentage ? `${formatted}%` : formatted;
+                    };
+                    
                     const fields = [
                         { label: "Market Cap", value: data["Market Cap (INR)"] ? formatLargeNumber(data["Market Cap (INR)"]) : "N/A" },
-                        { label: "Trailing P/E", value: data["Trailing PE"] ? data["Trailing PE"].toFixed(2) : "N/A" },
-                        { label: "Price to Book (P/B)", value: data["Price to Book"] ? data["Price to Book"].toFixed(2) : "N/A" },
-                        { label: "Beta", value: data["Beta"] ? data["Beta"].toFixed(2) : "N/A" },
-                        { label: "Dividend Yield", value: data["Dividend Yield"] ? (data["Dividend Yield"] * 100).toFixed(2) + "%" : "N/A" },
-                        { label: "Profit Margin", value: data["Profit Margin"] ? (data["Profit Margin"] * 100).toFixed(2) + "%" : "N/A" },
-                        { label: "YoY Revenue Growth", value: data["Revenue Growth (YoY)"] ? (data["Revenue Growth (YoY)"] * 100).toFixed(2) + "%" : "N/A" },
+                        { label: "Trailing P/E", value: data["Trailing PE"] ? parseField(data["Trailing PE"]) : "N/A" },
+                        { label: "Price to Book (P/B)", value: data["Price to Book"] ? parseField(data["Price to Book"]) : "N/A" },
+                        { label: "Beta", value: data["Beta"] ? parseField(data["Beta"]) : "N/A" },
+                        { label: "Dividend Yield", value: data["Dividend Yield"] ? parseField(data["Dividend Yield"], true) : "N/A" },
+                        { label: "Profit Margin", value: data["Profit Margin"] ? parseField(data["Profit Margin"], true) : "N/A" },
+                        { label: "YoY Revenue Growth", value: data["Revenue Growth (YoY)"] ? parseField(data["Revenue Growth (YoY)"], true) : "N/A" },
                         { label: "Free Cash Flow", value: data["Free Cash Flow"] ? formatLargeNumber(data["Free Cash Flow"]) : "N/A" }
                     ];
                     
@@ -1648,12 +1705,21 @@
         }
         
         function formatLargeNumber(num) {
-            if (num >= 1e12) {
-                return "₹ " + (num / 1e12).toFixed(2) + " Lakh Cr";
-            } else if (num >= 1e7) {
-                return "₹ " + (num / 1e7).toFixed(2) + " Cr";
+            const cleanNum = (val) => {
+                if (val === null || val === undefined) return NaN;
+                if (typeof val === 'number') return val;
+                const cleaned = String(val).replace(/,/g, '');
+                return parseFloat(cleaned);
+            };
+            const n = cleanNum(num);
+            if (isNaN(n)) return String(num || "N/A");
+            
+            if (n >= 1e12) {
+                return "₹ " + (n / 1e12).toFixed(2) + " Lakh Cr";
+            } else if (n >= 1e7) {
+                return "₹ " + (n / 1e7).toFixed(2) + " Cr";
             }
-            return "₹ " + num.toLocaleString("en-IN");
+            return "₹ " + n.toLocaleString("en-IN");
         }
 
         async function fetchAndRenderChart(ticker) {
