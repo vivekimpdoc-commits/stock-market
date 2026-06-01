@@ -6,6 +6,8 @@
     <title>Indian Stock Market AI Dashboard</title>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --bg-color: #0b1121;
@@ -981,6 +983,17 @@
 
         <!-- Dashboard Tab Content (Unified View) -->
         <div id="dashboard-tab" class="tab-content">
+            <!-- Price Chart Card -->
+            <div class="glass-panel" id="chartCard" style="display: none; margin-bottom: 25px; min-height: 380px; position: relative;">
+                <h3 style="margin-bottom: 15px; font-size: 22px; display: flex; align-items: center; justify-content: space-between;">
+                    <span>30-Day Price Trend</span>
+                    <span id="chartTickerLabel" style="color: var(--accent-gold); font-size: 14px; font-weight: 700;"></span>
+                </h3>
+                <div style="width: 100%; height: 300px; position: relative;">
+                    <canvas id="priceChart"></canvas>
+                </div>
+            </div>
+            
             <div class="dashboard-grid">
                 
                 <!-- Left Column (Predict & Snapshot) -->
@@ -1137,6 +1150,7 @@
         let activeTicker = "";
         let liveIndicesInterval = null;
         let liveStockInterval = null;
+        let priceChartInstance = null;
 
         function getMarketStatus() {
             const now = new Date();
@@ -1295,6 +1309,137 @@
                 return "₹ " + (num / 1e7).toFixed(2) + " Cr";
             }
             return "₹ " + num.toLocaleString("en-IN");
+        }
+
+        async function fetchAndRenderChart(ticker) {
+            try {
+                const response = await fetch(`${API_BASE}/api/history/${ticker}`);
+                const card = document.getElementById("chartCard");
+                if (!response.ok) {
+                    if (card) card.style.display = "none";
+                    return;
+                }
+                const data = await response.json();
+                if (!data || data.length === 0) {
+                    if (card) card.style.display = "none";
+                    return;
+                }
+                
+                if (card) card.style.display = "block";
+                
+                const labelTicker = document.getElementById("chartTickerLabel");
+                if (labelTicker) labelTicker.innerText = ticker.toUpperCase();
+                
+                const labels = data.map(d => {
+                    const dateObj = new Date(d.date);
+                    return dateObj.toLocaleDateString("en-IN", { day: '2-digit', month: 'short' });
+                });
+                const prices = data.map(d => d.close);
+                
+                const ctx = document.getElementById("priceChart").getContext("2d");
+                
+                if (priceChartInstance) {
+                    priceChartInstance.destroy();
+                }
+                
+                // Create linear gradient for beautiful shadow effect
+                const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+                gradient.addColorStop(0, "rgba(59, 130, 246, 0.35)");
+                gradient.addColorStop(1, "rgba(59, 130, 246, 0.00)");
+                
+                priceChartInstance = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Closing Price (₹)',
+                            data: prices,
+                            borderColor: '#3b82f6',
+                            borderWidth: 3,
+                            pointBackgroundColor: '#3b82f6',
+                            pointBorderColor: 'rgba(255, 255, 255, 0.8)',
+                            pointBorderWidth: 1.5,
+                            pointRadius: 3,
+                            pointHoverRadius: 6,
+                            pointHoverBackgroundColor: '#f59e0b',
+                            pointHoverBorderColor: '#ffffff',
+                            pointHoverBorderWidth: 2,
+                            fill: true,
+                            backgroundColor: gradient,
+                            tension: 0.3,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                                titleColor: '#f8fafc',
+                                bodyColor: '#f8fafc',
+                                borderColor: 'rgba(255, 255, 255, 0.1)',
+                                borderWidth: 1,
+                                padding: 12,
+                                displayColors: false,
+                                callbacks: {
+                                    label: function(context) {
+                                        return `Price: ₹ ${context.parsed.y.toLocaleString("en-IN", {minimumFractionDigits: 2})}`;
+                                    }
+                                },
+                                titleFont: {
+                                    family: 'Outfit',
+                                    size: 13,
+                                    weight: '600'
+                                },
+                                bodyFont: {
+                                    family: 'Outfit',
+                                    size: 14,
+                                    weight: '800'
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.04)',
+                                    drawBorder: false
+                                },
+                                ticks: {
+                                    color: '#94a3b8',
+                                    font: {
+                                        family: 'Outfit',
+                                        size: 11
+                                    },
+                                    maxTicksLimit: 10
+                                }
+                            },
+                            y: {
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.04)',
+                                    drawBorder: false
+                                },
+                                ticks: {
+                                    color: '#94a3b8',
+                                    font: {
+                                        family: 'Outfit',
+                                        size: 11
+                                    },
+                                    callback: function(value) {
+                                        return '₹' + value.toLocaleString("en-IN");
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            } catch (err) {
+                console.error("[-] Error loading chart:", err);
+                const card = document.getElementById("chartCard");
+                if (card) card.style.display = "none";
+            }
         }
 
         // Autocomplete State
@@ -1466,6 +1611,13 @@
             contents.forEach(c => c.classList.remove("active"));
             document.getElementById("navTabs").style.display = "none";
             document.getElementById("portfolioResults").style.display = "none";
+            
+            const chartCard = document.getElementById("chartCard");
+            if (chartCard) chartCard.style.display = "none";
+            if (priceChartInstance) {
+                priceChartInstance.destroy();
+                priceChartInstance = null;
+            }
         }
         initDashboard();
  
@@ -1499,11 +1651,12 @@
             document.getElementById("dashboard-tab").classList.add("active");
             tablinks[0].classList.add("active");
             
-            // Fetch Predict, Sentiment, and Fundamentals data in parallel
+            // Fetch Predict, Sentiment, Fundamentals, and Chart data in parallel
             Promise.all([
                 fetchPrediction(activeTicker),
                 fetchSentiment(activeTicker),
-                fetchFundamentals(activeTicker)
+                fetchFundamentals(activeTicker),
+                fetchAndRenderChart(activeTicker)
             ]).then(() => {
                 document.getElementById("globalLoader").style.display = "none";
                 // Trigger first live quote update immediately and start interval

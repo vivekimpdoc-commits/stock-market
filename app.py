@@ -417,6 +417,43 @@ def get_fundamentals(ticker: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.get("/api/history/{ticker}")
+def get_history(ticker: str):
+    """
+    Returns historical price series for the last 30 trading days.
+    """
+    normalized = normalize_ticker(ticker)
+    clean_name = clean_ticker_name(normalized)
+    
+    price_file = os.path.join("data", f"{clean_name}_daily_prices.csv")
+    try:
+        if not os.path.exists(price_file):
+            df = fetch_historical_daily(normalized, start_date="2024-01-01")
+        else:
+            df = pd.read_csv(price_file)
+            
+        if df is None or df.empty:
+            raise HTTPException(status_code=404, detail="Historical prices not found.")
+            
+        # Ensure correct date formatting
+        df['Date'] = pd.to_datetime(df['Date'])
+        df = df.sort_values('Date')
+        
+        # Take the last 30 trading days
+        recent_df = df.tail(30)
+        
+        history_list = []
+        for _, row in recent_df.iterrows():
+            date_str = row['Date'].strftime('%Y-%m-%d')
+            history_list.append({
+                "date": date_str,
+                "close": float(row['Close']),
+                "volume": int(row['Volume']) if not pd.isna(row['Volume']) else 0
+            })
+        return history_list
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.get("/predict/{ticker}")
 def predict(ticker: str):
     """
