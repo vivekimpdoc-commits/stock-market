@@ -40,7 +40,7 @@ function getCandidates() {
         try {
             const files = fs.readdirSync(p);
             for (const f of files) {
-                if (f.toLowerCase() === 'python.exe' || f.toLowerCase() === 'python3.exe') {
+                if (f.toLowerCase() === 'python.exe' || f.toLowerCase() === 'python3.exe' || f === 'python' || f === 'python3') {
                     candidates.push(path.join(p, f));
                 }
             }
@@ -117,8 +117,8 @@ if (!pythonPath && existingPythons.length > 0) {
 }
 
 if (!pythonPath) {
-    console.log('[!] python.exe not found on the system. Using default "python" command.');
-    pythonPath = 'python';
+    pythonPath = process.platform === 'win32' ? 'python' : 'python3';
+    console.log(`[!] python executable not found in common paths. Using default "${pythonPath}" command.`);
 }
 
 console.log('[*] Starting FastAPI Uvicorn Server...');

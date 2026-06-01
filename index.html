@@ -1786,13 +1786,13 @@
 
     <script>
         // Check if user is logged in
-        if (localStorage.getItem("isLoggedIn") !== "true") {
-            window.location.href = "login.html";
+        if (localStorage.getItem("gatewayPassed") !== "true") {
+            window.location.href = "gateway.html";
         }
 
         function handleLogout() {
-            localStorage.removeItem("isLoggedIn");
-            window.location.href = "login.html";
+            localStorage.removeItem("gatewayPassed");
+            window.location.href = "gateway.html";
         }
 
         // Setup API_BASE dynamically with local storage and status checking

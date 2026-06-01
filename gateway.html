@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | NSE AI Dashboard</title>
+    <title>Gateway | NSE AI Dashboard</title>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -43,7 +43,7 @@
         }
 
         /* 1. Layout & Structure */
-        .auth-card {
+        .gateway-card {
             background: var(--panel-bg);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
@@ -58,24 +58,24 @@
             transition: all 0.3s ease;
         }
 
-        .auth-card:hover {
+        .gateway-card:hover {
             border-color: rgba(59, 130, 246, 0.2);
             box-shadow: 0 12px 40px rgba(0,0,0,0.4);
         }
 
-        .auth-header {
+        .gateway-header {
             text-align: center;
             margin-bottom: 25px;
         }
 
-        .auth-header h2 {
+        .gateway-header h2 {
             font-size: 26px;
             font-weight: 800;
             margin-bottom: 6px;
             color: var(--text-color);
         }
 
-        .auth-header p {
+        .gateway-header p {
             color: var(--text-muted);
             font-size: 14px;
         }
@@ -121,41 +121,6 @@
             letter-spacing: 0.5px;
             text-transform: uppercase;
             display: block;
-        }
-
-        /* Social Login Buttons */
-        .social-login {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .social-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            width: 100%;
-            padding: 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.03);
-            color: var(--text-color);
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .social-btn:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(59, 130, 246, 0.3);
-        }
-
-        .social-btn img {
-            width: 18px;
-            height: 18px;
         }
 
         .divider {
@@ -228,45 +193,6 @@
             font-weight: 600;
         }
 
-        /* Password Toggle */
-        .password-toggle {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: pointer;
-            color: var(--text-muted);
-            font-size: 16px;
-            user-select: none;
-        }
-
-        .password-toggle:hover {
-            color: var(--text-color);
-        }
-
-        /* Password Requirements */
-        .password-reqs {
-            display: none;
-            font-size: 11px;
-            color: var(--text-muted);
-            margin-top: -10px;
-            padding-left: 5px;
-        }
-        
-        .password-reqs.active {
-            display: block;
-        }
-
-        .req-item {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            margin-top: 4px;
-        }
-
-        .req-item.met { color: var(--success-color); }
-        .req-item.unmet { color: var(--danger-color); }
-
         /* Inline Validation Error */
         .error-msg {
             color: var(--danger-color);
@@ -323,28 +249,9 @@
 
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Switch Mode */
-        .switch-mode {
-            text-align: center;
-            margin-top: 25px;
-            font-size: 13px;
-            color: var(--text-muted);
-        }
-
-        .switch-mode a {
-            color: var(--accent-blue);
-            font-weight: 700;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        .switch-mode a:hover {
-            text-decoration: underline;
-        }
-
         /* Mobile Friendly Adjustments */
         @media (max-width: 480px) {
-            .auth-card {
+            .gateway-card {
                 padding: 30px 20px;
                 border-radius: 12px;
             }
@@ -353,7 +260,7 @@
 </head>
 <body>
 
-    <div class="auth-card" id="authCard">
+    <div class="gateway-card" id="gatewayCard">
         <!-- Logo Branding -->
         <div class="logo-container">
             <div class="logo-icon">N</div>
@@ -363,14 +270,14 @@
             </div>
         </div>
 
-        <div class="auth-header">
+        <div class="gateway-header">
             <h2 id="formTitle">AI System Gateway</h2>
             <p id="formSubtitle">Secure access to market analytics & forecast engine</p>
         </div>
 
-        <form id="authForm" onsubmit="handleSubmit(event)">
+        <form id="gatewayForm" onsubmit="handleSubmit(event)">
             <div style="text-align: center; margin: 10px 0 20px 0; font-size: 14px; color: var(--text-muted); line-height: 1.5;">
-                You are entering the guest environment. No credentials or login info are collected.
+                You are entering the guest environment. No sensitive information is collected.
             </div>
 
             <button type="submit" class="primary-btn" id="submitBtn">
@@ -390,8 +297,8 @@
             // Simulate Gateway Handshake
             setTimeout(() => {
                 btn.classList.remove('loading');
-                // Set login state
-                localStorage.setItem("isLoggedIn", "true");
+                // Set gateway state
+                localStorage.setItem("gatewayPassed", "true");
                 // Navigate to dashboard
                 window.location.href = "index.html";
             }, 1000);

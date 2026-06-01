@@ -62,20 +62,20 @@ def read_index():
 def read_index_html():
     return read_index()
 
-@app.get("/login", response_class=HTMLResponse)
-def read_login():
+@app.get("/gateway", response_class=HTMLResponse)
+def read_gateway():
     """
-    Serves the new login page.
+    Serves the gateway page.
     """
-    login_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "login.html")
-    if os.path.exists(login_path):
-        with open(login_path, "r", encoding="utf-8") as f:
+    gateway_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "gateway.html")
+    if os.path.exists(gateway_path):
+        with open(gateway_path, "r", encoding="utf-8") as f:
             return HTMLResponse(content=f.read())
-    return HTMLResponse(content="<h1>login.html file not found!</h1>", status_code=404)
+    return HTMLResponse(content="<h1>gateway.html file not found!</h1>", status_code=404)
 
-@app.get("/login.html", response_class=HTMLResponse)
-def read_login_html():
-    return read_login()
+@app.get("/gateway.html", response_class=HTMLResponse)
+def read_gateway_html():
+    return read_gateway()
 
 @app.get("/status")
 def status():
