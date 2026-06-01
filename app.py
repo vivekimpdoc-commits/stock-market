@@ -401,6 +401,22 @@ def get_live_quote(ticker: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.get("/api/fundamentals/{ticker}")
+def get_fundamentals(ticker: str):
+    """
+    Downloads latest company fundamentals and valuation metrics.
+    """
+    normalized = normalize_ticker(ticker)
+    try:
+        df = fetch_key_valuation_metrics(normalized)
+        if df is None or df.empty:
+            raise HTTPException(status_code=404, detail=f"Valuation metrics not found for ticker: {ticker}")
+        
+        row_dict = df.iloc[0].to_dict()
+        return row_dict
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.get("/predict/{ticker}")
 def predict(ticker: str):
     """

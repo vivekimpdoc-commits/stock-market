@@ -112,6 +112,43 @@
             vertical-align: middle;
         }
 
+        .fundamentals-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .fundamental-item {
+            background: rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            padding: 12px 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            transition: all 0.3s ease;
+        }
+        
+        .fundamental-item:hover {
+            background: rgba(255, 255, 255, 0.02);
+            border-color: rgba(59, 130, 246, 0.2);
+            transform: translateY(-1px);
+        }
+        
+        .fundamental-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+        }
+        
+        .fundamental-value {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--text-color);
+        }
+
         /* Main Header */
         header {
             width: 100%;
@@ -993,9 +1030,17 @@
                     </div>
                 </div>
 
-                <!-- Right Column (Sentiment) -->
+                <!-- Right Column (Sentiment & Fundamentals) -->
                 <div class="dashboard-column">
-                    <div class="glass-panel" style="height: 100%;">
+                    <div class="glass-panel" id="fundamentalsCard" style="display: none;">
+                        <h3 style="margin-bottom: 5px; font-size: 22px;">Company Fundamentals</h3>
+                        <div id="companyLongName" style="color: var(--accent-gold); font-size: 13px; font-weight: 700; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 0.5px;">Company Name</div>
+                        <div class="fundamentals-grid" id="fundamentalsContainer">
+                            <!-- Injected dynamically -->
+                        </div>
+                    </div>
+
+                    <div class="glass-panel" style="flex-grow: 1;">
                         <div class="sentiment-summary-panel">
                             <div>
                                 <h3 style="font-size: 22px; margin-bottom: 5px;">News Sentiment</h3>
@@ -1193,6 +1238,63 @@
             } catch (err) {
                 console.error("[-] Error fetching live stock price:", err);
             }
+        }
+
+        async function fetchFundamentals(ticker) {
+            try {
+                const response = await fetch(`${API_BASE}/api/fundamentals/${ticker}`);
+                const card = document.getElementById("fundamentalsCard");
+                const container = document.getElementById("fundamentalsContainer");
+                
+                if (!response.ok) {
+                    if (card) card.style.display = "none";
+                    return;
+                }
+                const data = await response.json();
+                
+                if (card && container) {
+                    card.style.display = "block";
+                    container.innerHTML = "";
+                    
+                    const nameHeader = document.getElementById("companyLongName");
+                    if (nameHeader) {
+                        nameHeader.innerText = data["Long Name"] || ticker;
+                    }
+                    
+                    const fields = [
+                        { label: "Market Cap", value: data["Market Cap (INR)"] ? formatLargeNumber(data["Market Cap (INR)"]) : "N/A" },
+                        { label: "Trailing P/E", value: data["Trailing PE"] ? data["Trailing PE"].toFixed(2) : "N/A" },
+                        { label: "Price to Book (P/B)", value: data["Price to Book"] ? data["Price to Book"].toFixed(2) : "N/A" },
+                        { label: "Beta", value: data["Beta"] ? data["Beta"].toFixed(2) : "N/A" },
+                        { label: "Dividend Yield", value: data["Dividend Yield"] ? (data["Dividend Yield"] * 100).toFixed(2) + "%" : "N/A" },
+                        { label: "Profit Margin", value: data["Profit Margin"] ? (data["Profit Margin"] * 100).toFixed(2) + "%" : "N/A" },
+                        { label: "YoY Revenue Growth", value: data["Revenue Growth (YoY)"] ? (data["Revenue Growth (YoY)"] * 100).toFixed(2) + "%" : "N/A" },
+                        { label: "Free Cash Flow", value: data["Free Cash Flow"] ? formatLargeNumber(data["Free Cash Flow"]) : "N/A" }
+                    ];
+                    
+                    fields.forEach(f => {
+                        container.innerHTML += `
+                            <div class="fundamental-item">
+                                <span class="fundamental-label">${f.label}</span>
+                                <span class="fundamental-value">${f.value}</span>
+                            </div>
+                        `;
+                    });
+                }
+            } catch (err) {
+                console.error("[-] Error fetching fundamentals:", err);
+                const card = document.getElementById("fundamentalsCard");
+                if (card) card.style.display = "none";
+            }
+        }
+        
+        function formatLargeNumber(num) {
+            if (num >= 1e12) {
+                return "₹ " + (num / 1e12).toFixed(2) + " Lakh Cr";
+            } else if (num >= 1e7) {
+                return "₹ " + (num / 1e7).toFixed(2) + " Cr";
+            }
+            return "₹ " + num.toLocaleString("en-IN");
         }
 
         // Autocomplete State
@@ -1397,10 +1499,11 @@
             document.getElementById("dashboard-tab").classList.add("active");
             tablinks[0].classList.add("active");
             
-            // Fetch Predict and Sentiment data in parallel
+            // Fetch Predict, Sentiment, and Fundamentals data in parallel
             Promise.all([
                 fetchPrediction(activeTicker),
-                fetchSentiment(activeTicker)
+                fetchSentiment(activeTicker),
+                fetchFundamentals(activeTicker)
             ]).then(() => {
                 document.getElementById("globalLoader").style.display = "none";
                 // Trigger first live quote update immediately and start interval

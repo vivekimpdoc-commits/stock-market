@@ -20,9 +20,10 @@ class _StockPredictorWidgetState extends State<StockPredictorWidget> {
   final TextEditingController _tickerController = TextEditingController();
   bool _isLoading = false;
   Map<String, dynamic>? _predictionData;
+  Map<String, dynamic>? _liveQuoteData;
   String? _errorMessage;
 
-  // Function to call FastAPI GET /predict/{ticker}
+  // Function to call FastAPI endpoints
   Future<void> fetchPrediction(String ticker) async {
     if (ticker.isEmpty) return;
 
@@ -30,16 +31,32 @@ class _StockPredictorWidgetState extends State<StockPredictorWidget> {
       _isLoading = true;
       _errorMessage = null;
       _predictionData = null;
+      _liveQuoteData = null;
     });
 
-    final url = Uri.parse('${widget.apiBaseUrl}/predict/\$ticker');
+    final formattedTicker = ticker.toUpperCase();
+    final url = Uri.parse('${widget.apiBaseUrl}/predict/$formattedTicker');
+    final liveUrl = Uri.parse('${widget.apiBaseUrl}/api/live/quote/$formattedTicker');
 
     try {
       final response = await http.get(url).timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
+        final predData = json.decode(response.body);
+        Map<String, dynamic>? liveData;
+        
+        try {
+          final liveRes = await http.get(liveUrl).timeout(const Duration(seconds: 5));
+          if (liveRes.statusCode == 200) {
+            liveData = json.decode(liveRes.body);
+          }
+        } catch (liveErr) {
+          print("Failed to fetch live quote in Flutter client: $liveErr");
+        }
+
         setState(() {
-          _predictionData = json.decode(response.body);
+          _predictionData = predData;
+          _liveQuoteData = liveData;
           _isLoading = false;
         });
       } else {
@@ -51,7 +68,7 @@ class _StockPredictorWidgetState extends State<StockPredictorWidget> {
       }
     } catch (e) {
       setState(() {
-        _errorMessage = 'Network error: Could not connect to API server. \\nMake sure Uvicorn is running.';
+        _errorMessage = 'Network error: Could not connect to API server. \nMake sure Uvicorn is running.';
         _isLoading = false;
       });
     }
@@ -161,9 +178,74 @@ class _StockPredictorWidgetState extends State<StockPredictorWidget> {
                     ),
                     const SizedBox(height: 5),
                     Text(
-                      'Last Close: ₹ \${_predictionData!['last_close_price'].toStringAsFixed(2)}',
+                      'Last Close: ₹ ${_predictionData!['last_close_price'].toStringAsFixed(2)}',
                       style: const TextStyle(color: Colors.grey, fontSize: 16),
                     ),
+                    if (_liveQuoteData != null) ...[
+                      const SizedBox(height: 12),
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.03),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.white.withOpacity(0.04)),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  width: 6,
+                                  height: 6,
+                                  decoration: const BoxDecoration(
+                                    color: Colors.emerald,
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                                const Text(
+                                  'LIVE PRICE (LTP)',
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: 1,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 6),
+                            RichText(
+                              text: TextSpan(
+                                text: '₹ ${_liveQuoteData!['lastPrice'].toStringAsFixed(2)} ',
+                                style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                                children: [
+                                  TextSpan(
+                                    text: ' ${_liveQuoteData!['change'] >= 0 ? '+' : ''}${_liveQuoteData!['change'].toStringAsFixed(2)} (${_liveQuoteData!['change'] >= 0 ? '+' : ''}${_liveQuoteData!['pChange'].toStringAsFixed(2)}%)',
+                                    style: TextStyle(
+                                      color: _liveQuoteData!['change'] >= 0 ? Colors.emerald : Colors.redAccent,
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              'High: ₹ ${_liveQuoteData!['dayHigh']} | Low: ₹ ${_liveQuoteData!['dayLow']} | Vol: ${_liveQuoteData!['volume']}',
+                              style: const TextStyle(color: Colors.grey, fontSize: 11),
+                            ),
+                            const SizedBox(height: 3),
+                            Text(
+                              'Source: ${_liveQuoteData!['source']}'.toUpperCase(),
+                              style: const TextStyle(color: Colors.amber, fontSize: 9, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                     const Divider(color: Colors.grey, height: 40, thickness: 0.5),
                     
                     const Text(

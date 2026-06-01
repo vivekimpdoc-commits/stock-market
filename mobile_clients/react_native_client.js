@@ -34,15 +34,17 @@ export default function StockPredictorApp() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [prediction, setPrediction] = useState(null);
+  const [liveQuote, setLiveQuote] = useState(null);
   const [sentiment, setSentiment] = useState(null);
 
-  // Fetch prediction and sentiment simultaneously
+  // Fetch prediction, live quote, and sentiment simultaneously
   const handleSearch = async () => {
     if (!ticker.trim()) return;
     
     setLoading(true);
     setError(null);
     setPrediction(null);
+    setLiveQuote(null);
     setSentiment(null);
 
     const formattedTicker = ticker.trim().toUpperCase();
@@ -61,7 +63,21 @@ export default function StockPredictorApp() {
       const predData = await predResponse.json();
       setPrediction(predData);
 
-      // 2. Fetch News Sentiment (Non-blocking fallback if it fails)
+      // 2. Fetch Live Quote (Non-blocking fallback)
+      try {
+        const liveResponse = await fetch(`${API_BASE_URL}/api/live/quote/${formattedTicker}`, {
+          method: 'GET',
+          headers: { Accept: 'application/json' },
+        });
+        if (liveResponse.ok) {
+          const liveData = await liveResponse.json();
+          setLiveQuote(liveData);
+        }
+      } catch (liveErr) {
+        console.warn('Failed to fetch live quote info:', liveErr);
+      }
+
+      // 3. Fetch News Sentiment (Non-blocking fallback)
       try {
         const sentResponse = await fetch(`${API_BASE_URL}/sentiment/${formattedTicker}`, {
           method: 'GET',
@@ -147,6 +163,28 @@ export default function StockPredictorApp() {
             <Text style={styles.priceText}>
               Last Close Price: <Text style={styles.boldText}>₹{prediction.last_close_price?.toFixed(2)}</Text>
             </Text>
+
+            {/* Live Price LTP (if available) */}
+            {liveQuote && (
+              <View style={styles.liveQuoteContainer}>
+                <View style={styles.liveDotRow}>
+                  <View style={styles.liveDot} />
+                  <Text style={styles.liveLabel}>LIVE PRICE (LTP)</Text>
+                </View>
+                <Text style={styles.livePriceText}>
+                  ₹{liveQuote.lastPrice?.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                  <Text style={[styles.liveChangeText, { color: liveQuote.change >= 0 ? '#10B981' : '#EF4444' }]}>
+                    {' '}{liveQuote.change >= 0 ? '+' : ''}{liveQuote.change?.toFixed(2)} ({liveQuote.change >= 0 ? '+' : ''}{liveQuote.pChange?.toFixed(2)}%)
+                  </Text>
+                </Text>
+                <Text style={styles.liveDetailsText}>
+                  High: ₹{liveQuote.dayHigh?.toLocaleString('en-IN', { minimumFractionDigits: 2 })} | Low: ₹{liveQuote.dayLow?.toLocaleString('en-IN', { minimumFractionDigits: 2 })} | Vol: {liveQuote.volume?.toLocaleString('en-IN')}
+                </Text>
+                <Text style={styles.liveSourceText}>
+                  Source: {liveQuote.source}
+                </Text>
+              </View>
+            )}
 
             <View style={styles.divider} />
 
@@ -458,5 +496,52 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontStyle: 'italic',
     marginTop: 8,
+  },
+  liveQuoteContainer: {
+    marginTop: 12,
+    padding: 14,
+    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.05)',
+  },
+  liveDotRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  liveDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#10B981',
+    marginRight: 6,
+  },
+  liveLabel: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#9CA3AF',
+    letterSpacing: 1,
+  },
+  livePriceText: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: '#FFFFFF',
+  },
+  liveChangeText: {
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  liveDetailsText: {
+    fontSize: 11,
+    color: '#9CA3AF',
+    marginTop: 4,
+  },
+  liveSourceText: {
+    fontSize: 9,
+    color: '#F59E0B',
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    marginTop: 2,
   },
 });

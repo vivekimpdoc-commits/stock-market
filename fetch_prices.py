@@ -339,19 +339,23 @@ def get_live_indices_yfinance():
     for name, ticker in indices.items():
         try:
             t = yf.Ticker(ticker)
-            hist = t.history(period="2d")
+            hist = t.history(period="5d")
             if len(hist) >= 2:
                 last_price = float(hist['Close'].iloc[-1])
                 prev_close = float(hist['Close'].iloc[-2])
+                change = last_price - prev_close
+                p_change = (change / prev_close) * 100 if prev_close != 0 else 0
             elif len(hist) == 1:
                 last_price = float(hist['Close'].iloc[0])
-                prev_close = float(t.fast_info.get('previousClose', last_price))
+                prev_close = last_price
+                change = 0.0
+                p_change = 0.0
             else:
                 last_price = 0.0
                 prev_close = 0.0
+                change = 0.0
+                p_change = 0.0
                 
-            change = last_price - prev_close
-            p_change = (change / prev_close) * 100 if prev_close != 0 else 0
             result.append({
                 "index": name,
                 "last": last_price,
