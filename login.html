@@ -364,188 +364,37 @@
         </div>
 
         <div class="auth-header">
-            <h2 id="formTitle">Welcome Back</h2>
-            <p id="formSubtitle">Log in to your account</p>
+            <h2 id="formTitle">AI System Gateway</h2>
+            <p id="formSubtitle">Secure access to market analytics & forecast engine</p>
         </div>
-
-        <div class="social-login">
-            <button class="social-btn">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google">
-                Continue with Google
-            </button>
-        </div>
-
-        <div class="divider">OR</div>
 
         <form id="authForm" onsubmit="handleSubmit(event)">
-            <div class="input-group" id="emailGroup">
-                <input type="email" id="email" placeholder=" " required oninput="validateEmail()">
-                <label for="email">Email Address</label>
-                <div class="error-msg" id="emailError">Please enter a valid email address.</div>
-            </div>
-
-            <div class="input-group" id="passGroup">
-                <input type="password" id="password" placeholder=" " required oninput="validatePassword()">
-                <label for="password">Password</label>
-                <span class="password-toggle" onclick="togglePassword()">👁️</span>
-                <div class="error-msg" id="passError">Password is required.</div>
-            </div>
-
-            <!-- Password Requirements (Only visible on Sign Up) -->
-            <div class="password-reqs" id="passReqs">
-                <div class="req-item unmet" id="reqUpper">● At least 1 uppercase letter</div>
-                <div class="req-item unmet" id="reqNumber">● At least 1 number</div>
-                <div class="req-item unmet" id="reqLen">● Minimum 8 characters</div>
+            <div style="text-align: center; margin: 10px 0 20px 0; font-size: 14px; color: var(--text-muted); line-height: 1.5;">
+                You are entering the guest environment. No credentials or login info are collected.
             </div>
 
             <button type="submit" class="primary-btn" id="submitBtn">
-                <span class="btn-text" id="submitText">Login</span>
+                <span class="btn-text" id="submitText">Enter Dashboard</span>
                 <div class="spinner"></div>
             </button>
         </form>
-
-        <div class="switch-mode">
-            <span id="switchText">Don't have an account?</span> 
-            <a onclick="toggleMode()" id="switchAction">Sign Up</a>
-        </div>
     </div>
 
     <script>
-        let isLoginMode = true;
-
-        const authForm = document.getElementById('authForm');
-        const emailInput = document.getElementById('email');
-        const passInput = document.getElementById('password');
-        
-        const formTitle = document.getElementById('formTitle');
-        const formSubtitle = document.getElementById('formSubtitle');
-        const submitText = document.getElementById('submitText');
-        const switchText = document.getElementById('switchText');
-        const switchAction = document.getElementById('switchAction');
-        const passReqs = document.getElementById('passReqs');
-
-        // Toggle Password Visibility
-        function togglePassword() {
-            const type = passInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passInput.setAttribute('type', type);
-        }
-
-        // Switch between Login and Sign Up
-        function toggleMode() {
-            isLoginMode = !isLoginMode;
-            
-            // Clear inputs and errors
-            authForm.reset();
-            document.getElementById('emailGroup').classList.remove('error');
-            document.getElementById('passGroup').classList.remove('error');
-
-            if (isLoginMode) {
-                formTitle.innerText = "Welcome Back";
-                formSubtitle.innerText = "Log in to your account";
-                submitText.innerText = "Login";
-                switchText.innerText = "Don't have an account?";
-                switchAction.innerText = "Sign Up";
-                passReqs.classList.remove('active');
-            } else {
-                formTitle.innerText = "Create Account";
-                formSubtitle.innerText = "Sign up to get started";
-                submitText.innerText = "Sign Up";
-                switchText.innerText = "Already have an account?";
-                switchAction.innerText = "Login";
-                passReqs.classList.add('active');
-                validatePassword(); // Reset requirement colors
-            }
-        }
-
-        // Inline Validation: Email
-        function validateEmail() {
-            const group = document.getElementById('emailGroup');
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            
-            if (emailInput.value.length > 0 && !emailRegex.test(emailInput.value)) {
-                group.classList.add('error');
-                return false;
-            } else {
-                group.classList.remove('error');
-                return true;
-            }
-        }
-
-        // Inline Validation: Password
-        function validatePassword() {
-            const val = passInput.value;
-            const group = document.getElementById('passGroup');
-            
-            // If in sign up mode, update requirement trackers
-            if (!isLoginMode) {
-                const reqUpper = document.getElementById('reqUpper');
-                const reqNumber = document.getElementById('reqNumber');
-                const reqLen = document.getElementById('reqLen');
-
-                const hasUpper = /[A-Z]/.test(val);
-                const hasNumber = /[0-9]/.test(val);
-                const hasLen = val.length >= 8;
-
-                reqUpper.className = "req-item " + (hasUpper ? "met" : "unmet");
-                reqNumber.className = "req-item " + (hasNumber ? "met" : "unmet");
-                reqLen.className = "req-item " + (hasLen ? "met" : "unmet");
-                
-                if (val.length > 0 && (!hasUpper || !hasNumber || !hasLen)) {
-                    group.classList.add('error');
-                    document.getElementById('passError').innerText = "Please meet all password requirements.";
-                    return false;
-                } else {
-                    group.classList.remove('error');
-                    return true;
-                }
-            } else {
-                // In Login mode, just check if it's not empty
-                if (val.length === 0 && document.activeElement !== passInput) {
-                    group.classList.add('error');
-                    document.getElementById('passError').innerText = "Password is required.";
-                    return false;
-                } else {
-                    group.classList.remove('error');
-                    return true;
-                }
-            }
-        }
-
-        // Handle Submit and Show Loading State
         function handleSubmit(e) {
             e.preventDefault();
             
-            const isEmailValid = validateEmail();
-            const isPassValid = validatePassword();
-
-            // Final check before submission
-            if (!emailInput.value) {
-                document.getElementById('emailGroup').classList.add('error');
-            }
-            if (!passInput.value) {
-                document.getElementById('passGroup').classList.add('error');
-            }
-
-            if (!isEmailValid || !isPassValid || !emailInput.value || !passInput.value) {
-                return;
-            }
-
             const btn = document.getElementById('submitBtn');
             btn.classList.add('loading');
 
-            // Simulate API Call
+            // Simulate Gateway Handshake
             setTimeout(() => {
                 btn.classList.remove('loading');
-                if (isLoginMode) {
-                    // Set login state
-                    localStorage.setItem("isLoggedIn", "true");
-                    // Navigate to dashboard using relative path for GitHub Pages compatibility
-                    window.location.href = "index.html";
-                } else {
-                    alert("Account created successfully! Please login.");
-                    toggleMode();
-                }
-            }, 1500);
+                // Set login state
+                localStorage.setItem("isLoggedIn", "true");
+                // Navigate to dashboard
+                window.location.href = "index.html";
+            }, 1000);
         }
     </script>
 </body>
