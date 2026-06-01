@@ -4,18 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login | NSE AI Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #4f46e5; /* Deep Purple/Blue */
-            --primary-hover: #4338ca;
-            --bg-color: #f3f4f6;
-            --card-bg: #ffffff;
-            --text-main: #111827;
-            --text-muted: #6b7280;
-            --border-color: #d1d5db;
-            --error-color: #ef4444;
+            --bg-color: #0b1121;
+            --panel-bg: rgba(17, 24, 39, 0.65);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --accent-blue: #3b82f6; 
+            --accent-gold: #f59e0b;
+            --text-color: #f8fafc;
+            --text-muted: #94a3b8;
             --success-color: #10b981;
+            --success-bg: rgba(16, 185, 129, 0.15);
+            --danger-color: #ef4444;
+            --danger-bg: rgba(239, 68, 68, 0.15);
+            --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --border-radius: 12px;
         }
 
         * {
@@ -27,43 +32,95 @@
         body {
             font-family: 'Outfit', sans-serif;
             background-color: var(--bg-color);
-            background-image: radial-gradient(circle at 10% 20%, rgba(79, 70, 229, 0.05) 0%, transparent 40%), 
-                              radial-gradient(circle at 90% 80%, rgba(79, 70, 229, 0.08) 0%, transparent 40%);
+            background-image: radial-gradient(circle at 50% -20%, #1e3a8a 0%, transparent 40%), 
+                              radial-gradient(circle at -10% 80%, rgba(245, 158, 11, 0.05) 0%, transparent 30%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--text-main);
+            color: var(--text-color);
             padding: 20px;
         }
 
         /* 1. Layout & Structure */
         .auth-card {
-            background: var(--card-bg);
+            background: var(--panel-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             width: 100%;
-            max-width: 420px;
+            max-width: 440px;
             border-radius: 16px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--card-shadow);
             padding: 40px;
             position: relative;
             overflow: hidden;
             transition: all 0.3s ease;
         }
 
+        .auth-card:hover {
+            border-color: rgba(59, 130, 246, 0.2);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+        }
+
         .auth-header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
 
         .auth-header h2 {
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 8px;
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 6px;
+            color: var(--text-color);
         }
 
         .auth-header p {
             color: var(--text-muted);
-            font-size: 15px;
+            font-size: 14px;
+        }
+
+        /* Logo Branding */
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 25px;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            background: var(--accent-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            color: #ffffff;
+            font-size: 18px;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+        }
+
+        .logo-text {
+            text-align: left;
+        }
+
+        .logo-title {
+            font-weight: 800;
+            color: #ffffff;
+            font-size: 18px;
+            line-height: 1.2;
+        }
+
+        .logo-subtitle {
+            color: var(--accent-gold);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            display: block;
         }
 
         /* Social Login Buttons */
@@ -71,7 +128,7 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
         .social-btn {
@@ -83,22 +140,22 @@
             padding: 12px;
             border: 1px solid var(--border-color);
             border-radius: 8px;
-            background: #fff;
-            color: var(--text-main);
-            font-size: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-color);
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
         }
 
         .social-btn:hover {
-            background: #f9fafb;
-            border-color: #9ca3af;
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(59, 130, 246, 0.3);
         }
 
         .social-btn img {
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
         }
 
         .divider {
@@ -106,8 +163,8 @@
             align-items: center;
             text-align: center;
             color: var(--text-muted);
-            font-size: 13px;
-            margin-bottom: 25px;
+            font-size: 12px;
+            margin-bottom: 20px;
         }
 
         .divider::before, .divider::after {
@@ -123,7 +180,7 @@
         form {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 18px;
         }
 
         .input-group {
@@ -139,7 +196,8 @@
             font-family: inherit;
             outline: none;
             transition: border-color 0.2s;
-            background: transparent;
+            background: rgba(0, 0, 0, 0.25);
+            color: var(--text-color);
         }
 
         /* Floating Label Logic */
@@ -152,20 +210,21 @@
             font-size: 15px;
             pointer-events: none;
             transition: 0.2s ease all;
-            background: #fff;
-            padding: 0 4px;
+            background: var(--bg-color);
+            padding: 0 6px;
+            border-radius: 4px;
         }
 
         .input-group input:focus,
         .input-group input:not(:placeholder-shown) {
-            border-color: var(--primary);
+            border-color: var(--accent-blue);
         }
 
         .input-group input:focus ~ label,
         .input-group input:not(:placeholder-shown) ~ label {
             top: 0;
-            font-size: 12px;
-            color: var(--primary);
+            font-size: 11px;
+            color: var(--accent-blue);
             font-weight: 600;
         }
 
@@ -177,20 +236,20 @@
             transform: translateY(-50%);
             cursor: pointer;
             color: var(--text-muted);
-            font-size: 18px;
+            font-size: 16px;
             user-select: none;
         }
 
         .password-toggle:hover {
-            color: var(--text-main);
+            color: var(--text-color);
         }
 
         /* Password Requirements */
         .password-reqs {
             display: none;
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-muted);
-            margin-top: -12px;
+            margin-top: -10px;
             padding-left: 5px;
         }
         
@@ -206,28 +265,28 @@
         }
 
         .req-item.met { color: var(--success-color); }
-        .req-item.unmet { color: var(--error-color); }
+        .req-item.unmet { color: var(--danger-color); }
 
         /* Inline Validation Error */
         .error-msg {
-            color: var(--error-color);
-            font-size: 12px;
+            color: var(--danger-color);
+            font-size: 11px;
             margin-top: 4px;
             display: none;
             padding-left: 5px;
         }
-        .input-group.error input { border-color: var(--error-color); }
+        .input-group.error input { border-color: var(--danger-color); }
         .input-group.error .error-msg { display: block; }
-        .input-group.error label { color: var(--error-color) !important; }
+        .input-group.error label { color: var(--danger-color) !important; }
 
         /* Primary Button */
         .primary-btn {
-            background-color: var(--primary);
+            background: linear-gradient(135deg, var(--accent-blue) 0%, #2563eb 100%);
             color: white;
             border: none;
             border-radius: 8px;
             padding: 14px;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.2s;
@@ -235,12 +294,12 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
-            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
         }
 
         .primary-btn:hover {
-            background-color: var(--primary-hover);
             transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
         }
 
         .primary-btn:active {
@@ -268,12 +327,12 @@
         .switch-mode {
             text-align: center;
             margin-top: 25px;
-            font-size: 14px;
+            font-size: 13px;
             color: var(--text-muted);
         }
 
         .switch-mode a {
-            color: var(--primary);
+            color: var(--accent-blue);
             font-weight: 700;
             text-decoration: none;
             cursor: pointer;
@@ -288,7 +347,6 @@
             .auth-card {
                 padding: 30px 20px;
                 border-radius: 12px;
-                box-shadow: 0 4px 20px rgba(0,0,0,0.05);
             }
         }
     </style>
@@ -296,6 +354,15 @@
 <body>
 
     <div class="auth-card" id="authCard">
+        <!-- Logo Branding -->
+        <div class="logo-container">
+            <div class="logo-icon">N</div>
+            <div class="logo-text">
+                <span class="logo-title">NSE India</span>
+                <span class="logo-subtitle">AI Forecasting Pipeline</span>
+            </div>
+        </div>
+
         <div class="auth-header">
             <h2 id="formTitle">Welcome Back</h2>
             <p id="formSubtitle">Log in to your account</p>
@@ -306,7 +373,6 @@
                 <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google">
                 Continue with Google
             </button>
-            <!-- Apple / FB can be added similarly -->
         </div>
 
         <div class="divider">OR</div>
@@ -461,7 +527,6 @@
             }
 
             if (!isEmailValid || !isPassValid || !emailInput.value || !passInput.value) {
-                // Shake effect on error could be added here
                 return;
             }
 
