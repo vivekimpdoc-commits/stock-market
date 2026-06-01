@@ -23,7 +23,8 @@ def run_backtest(ticker_prefix: str, initial_cash: float = 100000.0, commission:
     Returns:
     - Dict of performance metrics, or None if failed.
     """
-    data_dir = "data/preprocessed"
+    # Define directories relative to the execution root directory
+    data_dir = os.path.join("data", "preprocessed")
     models_dir = "models"
     plots_dir = "plots"
     

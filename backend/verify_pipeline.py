@@ -1,5 +1,7 @@
-import os
 import sys
+import os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 import pandas as pd
 import numpy as np
 
@@ -141,7 +143,7 @@ def verify():
         else:
             print("[X] index.html dashboard file is missing.")
             
-        print("    To run manually: uvicorn app:app --port 8000 --reload")
+        print("    To run manually: uvicorn backend.app:app --port 8000 --reload")
     except Exception as e:
         print(f"[X] FastAPI verification failed: {e}")
         

@@ -1,4 +1,7 @@
+import sys
 import os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 import pickle
 import pandas as pd
 import numpy as np
@@ -49,7 +52,7 @@ def read_index():
     """
     Serves the interactive glassmorphic stock market dashboard.
     """
-    index_path = "index.html"
+    index_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "index.html")
     if os.path.exists(index_path):
         with open(index_path, "r", encoding="utf-8") as f:
             return HTMLResponse(content=f.read())
@@ -64,7 +67,7 @@ def read_login():
     """
     Serves the new login page.
     """
-    login_path = "login.html"
+    login_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "login.html")
     if os.path.exists(login_path):
         with open(login_path, "r", encoding="utf-8") as f:
             return HTMLResponse(content=f.read())
@@ -99,10 +102,10 @@ def get_stocks():
     If it fails, falls back to a pre-defined list of ~160 popular stocks.
     """
     import json
-    cache_path = os.path.join("data", "nse_stocks.json")
+    cache_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "nse_stocks.json")
     
     # Ensure data directory exists
-    os.makedirs("data", exist_ok=True)
+    os.makedirs(os.path.dirname(cache_path), exist_ok=True)
     
     if os.path.exists(cache_path):
         try:
@@ -646,7 +649,7 @@ def predict(ticker: str):
         else:
             try:
                 with open(rf_model_path, 'rb') as f:
-                    model = pickle.load(f)
+                     model = pickle.load(f)
             except Exception as e:
                 raise HTTPException(status_code=500, detail=f"Error loading RandomForest model: {e}")
                 

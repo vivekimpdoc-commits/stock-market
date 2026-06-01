@@ -85,7 +85,7 @@ def prepare_ml_data(input_filepath: str, split_ratio: float = 0.80, save_dir: st
         dates_test = dates_filtered[split_idx:]
         
         # Feature Scaling
-        # CRITICAL: Fit Scaler ONLY on Training data to prevent information leakage!
+        # Fit Scaler ONLY on Training data to prevent information leakage
         scaler = StandardScaler()
         X_train_scaled = scaler.fit_transform(X_train_raw)
         X_test_scaled = scaler.transform(X_test_raw)

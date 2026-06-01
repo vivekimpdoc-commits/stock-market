@@ -1,5 +1,7 @@
-import os
 import sys
+import os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 import logging
 from fetch_prices import fetch_historical_daily, fetch_intraday, clean_ticker_name
 from fetch_fundamentals import fetch_financial_sheets, fetch_key_valuation_metrics

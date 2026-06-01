@@ -90,8 +90,6 @@ def fetch_historical_from_nse_website(symbol: str, start_date_str: str, end_date
     # Build dataframe
     records = []
     for item in all_data:
-        # In the response of NSE historical equity endpoint, the keys are:
-        # CH_TIMESTAMP, CH_OPENING_PRICE, CH_TRADE_HIGH_PRICE, CH_TRADE_LOW_PRICE, CH_CLOSING_PRICE, CH_TOT_TRADED_QTY
         records.append({
             "Date": item.get("CH_TIMESTAMP"),
             "Open": item.get("CH_OPENING_PRICE"),
@@ -411,4 +409,3 @@ if __name__ == "__main__":
     print("\n--- Testing Live Quote Fetch ---")
     quote = fetch_live_quote("TCS")
     print(quote)
-

@@ -122,7 +122,7 @@ if (!pythonPath) {
 }
 
 console.log('[*] Starting FastAPI Uvicorn Server...');
-const uvicorn = spawn(pythonPath, ['-m', 'uvicorn', 'app:app', '--host', '127.0.0.1', '--port', '8000'], {
+const uvicorn = spawn(pythonPath, ['-m', 'uvicorn', 'backend.app:app', '--host', '127.0.0.1', '--port', '8000'], {
     stdio: 'inherit',
     shell: true
 });
