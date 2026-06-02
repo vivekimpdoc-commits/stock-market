@@ -46,13 +46,25 @@ class PortfolioRequest(BaseModel):
     risk_free_rate: Optional[float] = 0.06
 
 from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+
+# Create frontend directory if it doesn't exist to prevent mount errors
+frontend_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "frontend")
+os.makedirs(frontend_dir, exist_ok=True)
+
+app.mount("/css", StaticFiles(directory=os.path.join(frontend_dir, "css")), name="css")
+app.mount("/js", StaticFiles(directory=os.path.join(frontend_dir, "js")), name="js")
 
 @app.get("/", response_class=HTMLResponse)
 def read_index():
     """
     Serves the interactive glassmorphic stock market dashboard.
     """
-    index_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "index.html")
+    index_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "frontend", "index.html")
+    # Fallback to root if not moved yet
+    if not os.path.exists(index_path):
+        index_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "index.html")
+        
     if os.path.exists(index_path):
         with open(index_path, "r", encoding="utf-8") as f:
             return HTMLResponse(content=f.read())
@@ -67,7 +79,11 @@ def read_gateway():
     """
     Serves the gateway page.
     """
-    gateway_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "gateway.html")
+    gateway_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "frontend", "gateway.html")
+    # Fallback to root if not moved yet
+    if not os.path.exists(gateway_path):
+        gateway_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "gateway.html")
+        
     if os.path.exists(gateway_path):
         with open(gateway_path, "r", encoding="utf-8") as f:
             return HTMLResponse(content=f.read())
@@ -92,6 +108,55 @@ def status():
             "NSE stock list suggestions (/api/stocks)"
         ]
     }
+
+@app.get("/api/sentiment/{ticker}")
+def get_sentiment(ticker: str):
+    """
+    Fetches latest news for the given ticker, analyzes sentiment using FinBERT/VADER,
+    and returns a list of scored articles.
+    """
+    clean_ticker = clean_ticker_name(ticker)
+    try:
+        # Fetch news and compute sentiment
+        df_news = fetch_and_analyze_sentiment(keyword_filter=clean_ticker)
+        
+        if df_news.empty:
+            return {
+                "sentiment_summary": "Neutral",
+                "mean_compound_score": 0.0,
+                "news_found": 0,
+                "headlines": []
+            }
+            
+        # Format articles
+        headlines = []
+        for _, row in df_news.head(10).iterrows():
+            headlines.append({
+                "label": row.get('sentiment_label', 'Neutral'),
+                "source": row.get('source', 'Unknown'),
+                "published_at": str(row.get('published_at', '')),
+                "headline": row.get('title', ''),
+                "score": float(row.get('sentiment_compound', 0.0))
+            })
+            
+        avg_compound = df_news['sentiment_compound'].mean()
+        
+        if avg_compound > 0.1:
+            overall = "Positive"
+        elif avg_compound < -0.1:
+            overall = "Negative"
+        else:
+            overall = "Neutral"
+            
+        return {
+            "sentiment_summary": overall,
+            "mean_compound_score": float(avg_compound),
+            "news_found": len(df_news),
+            "headlines": headlines
+        }
+    except Exception as e:
+        print(f"Error fetching sentiment for {ticker}: {e}")
+        raise HTTPException(status_code=500, detail="Failed to analyze news sentiment")
 
 @app.get("/api/stocks")
 def get_stocks():

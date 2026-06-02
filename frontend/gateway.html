@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gateway | NSE Advanced Terminal</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/gateway.css">
+</head>
+<body>
+    <div class="gateway-container">
+        <div class="terminal-card">
+            <div class="logo-section">
+                <div class="logo-icon">N</div>
+                <div class="logo-title">NSE Advanced Terminal</div>
+                <div class="logo-subtitle">Algorithmic Forecasting Engine</div>
+            </div>
+
+            <div class="status-box">
+                <div class="status-indicator"></div>
+                <div class="status-text">Connection Established. Servers Online.</div>
+            </div>
+
+            <div class="divider">
+                <div class="divider::center"></div>
+            </div>
+
+            <p style="text-align: center; color: var(--text-secondary); font-size: 13px; margin-bottom: 24px; line-height: 1.6;">
+                Access is granted for guest analysis. No sensitive tracking is active during this session.
+            </p>
+
+            <button type="button" class="primary-btn" id="submitBtn" onclick="handleSubmit()">
+                <span class="btn-text">Initialize Terminal</span>
+                <div class="spinner"></div>
+            </button>
+            
+            <div class="system-info">
+                <span>v2.4.1 (Stable)</span>
+                <span id="sysTime">00:00:00 UTC</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/gateway.js"></script>
+</body>
+</html>
