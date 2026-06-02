@@ -2475,8 +2475,8 @@
                 }
             }
 
-            // Combine and limit to 10 results
-            const filtered = [...startsWithQuery, ...containsQuerySymbol, ...containsQueryName].slice(0, 10);
+            // Combine and limit to 100 results to prevent massive DOM lag but show all matches realistically
+            const filtered = [...startsWithQuery, ...containsQuerySymbol, ...containsQueryName].slice(0, 100);
             
             if (filtered.length > 0) {
                 renderDropdown(filtered);
