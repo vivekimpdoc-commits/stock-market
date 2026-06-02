@@ -36,6 +36,14 @@ app.add_middleware(
 # Helper function to convert input ticker to standard NSE format
 def normalize_ticker(ticker: str) -> str:
     ticker = ticker.strip().upper()
+    
+    # Custom mapping for commonly mistyped tickers
+    ticker_mapping = {
+        "LIC": "LICI"
+    }
+    if ticker in ticker_mapping:
+        ticker = ticker_mapping[ticker]
+        
     if ticker and not ticker.startswith("^") and "." not in ticker:
         return f"{ticker}.NS"
     return ticker
