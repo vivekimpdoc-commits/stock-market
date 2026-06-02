@@ -1380,35 +1380,60 @@
     </style>
 </head>
 <body>
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo" style="padding: 20px; border-bottom: 1px solid var(--border-color); margin-bottom: 20px; background: transparent; box-shadow: none;">
+                <div class="logo-symbol">N</div>
+                <div class="logo-text">
+                    <span class="logo-title" style="font-size: 18px;">NSE Terminal</span>
+                    <span class="logo-subtitle">AI Forecasting</span>
+                </div>
+            </div>
+            
+            <div class="sidebar-nav" style="padding: 0 10px;">
+                <!-- Tab navigation -->
+                <div class="navigation-tabs" id="navTabs" style="display: none; flex-direction: column; gap: 8px; background: transparent; border: none; box-shadow: none;">
+                    <button class="tab-btn active" onclick="switchTab(event, 'dashboard-tab')" style="text-align: left; padding: 12px 16px;">
+                        Dashboard
+                    </button>
+                    <button class="tab-btn" onclick="switchTab(event, 'portfolio-tab')" style="text-align: left; padding: 12px 16px;">
+                        Portfolio Optimization
+                    </button>
+                </div>
+            </div>
 
-    <!-- Official NSE Top Bar -->
-    <div class="nse-top-bar">
-        <div class="top-bar-content">
-            <div class="index-items" id="liveIndicesBar">
-                <span class="index-item" id="nifty50-val"><strong>NIFTY 50</strong> <span style="color: var(--success-color); font-weight: 700;">Loading...</span></span>
-                <span class="index-item" id="niftybank-val" style="margin-left: 15px;"><strong>NIFTY BANK</strong> <span style="color: var(--success-color); font-weight: 700;">Loading...</span></span>
-                <span class="index-item" id="niftynext50-val" style="margin-left: 15px;"><strong>NIFTY NEXT 50</strong> <span style="color: var(--danger-color); font-weight: 700;">Loading...</span></span>
+            <!-- Market Status in Sidebar -->
+            <div style="margin-top: auto; padding: 20px; border-top: 1px solid var(--border-color);">
+                <div class="market-status" id="market-status-container" style="margin-bottom: 15px;">
+                    <span class="status-dot" id="status-dot"></span>
+                    <strong id="market-status-val">MARKET STATUS: OPEN</strong>
+                </div>
+                <!-- API Connection Indicator -->
+                <div id="api-status-badge" onclick="configureApiUrl()" style="font-size: 11px; padding: 6px 12px; border-radius: 4px; background: var(--success-bg); color: var(--success-color); border: 1px solid rgba(16, 185, 129, 0.2); font-weight: 700; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; width: 100%; justify-content: center;" title="Click to configure backend API URL">
+                    <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--success-color); display: inline-block;"></span>
+                    Checking API...
+                </div>
             </div>
-            <div class="market-status" id="market-status-container">
-                <span class="status-dot" id="status-dot"></span>
-                <strong id="market-status-val">MARKET STATUS: OPEN</strong>
-            </div>
-        </div>
-    </div>
+        </aside>
 
-    <header>
-        <div class="logo">
-            <div class="logo-symbol">N</div>
-            <div class="logo-text">
-                <span class="logo-title">NSE India</span>
-                <span class="logo-subtitle">AI Forecasting Pipeline</span>
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Official NSE Top Bar -->
+            <div class="nse-top-bar" style="background: var(--bg-surface);">
+                <div class="top-bar-content" style="justify-content: flex-start; max-width: none;">
+                    <div class="index-items" id="liveIndicesBar">
+                        <span class="index-item mono-num" id="nifty50-val"><strong>NIFTY 50</strong> <span style="color: var(--success-color); font-weight: 700;">Loading...</span></span>
+                        <span class="index-item mono-num" id="niftybank-val" style="margin-left: 15px;"><strong>NIFTY BANK</strong> <span style="color: var(--success-color); font-weight: 700;">Loading...</span></span>
+                        <span class="index-item mono-num" id="niftynext50-val" style="margin-left: 15px;"><strong>NIFTY NEXT 50</strong> <span style="color: var(--danger-color); font-weight: 700;">Loading...</span></span>
+                    </div>
+                </div>
             </div>
-            <!-- API Connection Indicator -->
-            <div id="api-status-badge" onclick="configureApiUrl()" style="margin-left: 15px; font-size: 11px; padding: 4px 10px; border-radius: 6px; background: rgba(16, 185, 129, 0.15); color: var(--success-color); border: 1px solid rgba(16, 185, 129, 0.3); font-weight: 700; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; transition: all 0.2s;" title="Click to configure backend API URL">
-                <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--success-color); display: inline-block;"></span>
-                Checking API...
-            </div>
-        </div>
+
+            <header style="background: transparent; border-bottom: 1px solid var(--border-color); box-shadow: none; padding: 15px 30px;">
+                <div class="header-left">
+                    <!-- Title or Breadcrumb could go here -->
+                </div>
         <div style="display: flex; align-items: center; gap: 15px;">
             <div class="search-container">
                 <input type="text" id="tickerInput" placeholder="Enter NSE Ticker (e.g. RELIANCE, TCS)" autocomplete="off">
@@ -1423,12 +1448,7 @@
         </div>
     </header>
 
-    <main>
-        <!-- Tab navigation -->
-        <div class="navigation-tabs" id="navTabs" style="display: none;">
-            <button class="tab-btn active" onclick="switchTab(event, 'dashboard-tab')">Stock Dashboard</button>
-            <button class="tab-btn" onclick="switchTab(event, 'portfolio-tab')">Portfolio Optimization</button>
-        </div>
+            <main style="max-width: 1400px; margin: 0 auto; width: 100%; padding: 30px;">
 
         <!-- Loader -->
         <div class="loading-container" id="globalLoader">
@@ -1818,6 +1838,8 @@
         <p>© 2026 NSE India AI Systems. Data sourced from and synchronized with the National Stock Exchange of India (NSE).</p>
     </footer>
 
+    </div>
+    </div>
     <script>
         // Check if user is logged in
         if (localStorage.getItem("gatewayPassed") !== "true") {
@@ -2214,15 +2236,15 @@
                 gradient.addColorStop(1, gradBot);
                 
                 const chartTooltipOptions = {
-                    backgroundColor: 'rgba(15, 23, 42, 0.95)',
-                    titleColor: '#f8fafc',
-                    bodyColor: '#f8fafc',
+                    backgroundColor: 'rgba(10, 10, 10, 0.95)',
+                    titleColor: '#f5f5f5',
+                    bodyColor: '#f5f5f5',
                     borderColor: 'rgba(255, 255, 255, 0.1)',
                     borderWidth: 1,
                     padding: 12,
                     displayColors: false,
-                    titleFont: { family: 'Outfit', size: 13, weight: '600' },
-                    bodyFont: { family: 'Outfit', size: 14, weight: '800' }
+                    titleFont: { family: 'Inter', size: 13, weight: '600' },
+                    bodyFont: { family: 'JetBrains Mono', size: 14, weight: '700' }
                 };
                 
                 priceChartInstance = new Chart(ctx, {
@@ -2233,14 +2255,14 @@
                             label: 'Close (₹)',
                             data: prices,
                             borderColor: lineColor,
-                            borderWidth: 2.5,
+                            borderWidth: 2,
                             pointBackgroundColor: lineColor,
-                            pointBorderColor: 'rgba(255,255,255,0.7)',
-                            pointBorderWidth: 1.5,
-                            pointRadius: prices.length > 90 ? 0 : 3,
-                            pointHoverRadius: 6,
-                            pointHoverBackgroundColor: '#f59e0b',
-                            pointHoverBorderColor: '#ffffff',
+                            pointBorderColor: 'transparent',
+                            pointBorderWidth: 0,
+                            pointRadius: prices.length > 90 ? 0 : 2,
+                            pointHoverRadius: 5,
+                            pointHoverBackgroundColor: '#ffffff',
+                            pointHoverBorderColor: lineColor,
                             pointHoverBorderWidth: 2,
                             fill: true,
                             backgroundColor: gradient,
@@ -2262,13 +2284,13 @@
                         },
                         scales: {
                             x: {
-                                grid: { color: 'rgba(255,255,255,0.03)', drawBorder: false },
-                                ticks: { color: '#94a3b8', font: { family: 'Outfit', size: 10 }, maxTicksLimit: 10 }
+                                grid: { display: false, drawBorder: false },
+                                ticks: { color: '#a3a3a3', font: { family: 'Inter', size: 10 }, maxTicksLimit: 10 }
                             },
                             y: {
-                                grid: { color: 'rgba(255,255,255,0.03)', drawBorder: false },
+                                grid: { display: false, drawBorder: false },
                                 ticks: {
-                                    color: '#94a3b8', font: { family: 'Outfit', size: 10 },
+                                    color: '#a3a3a3', font: { family: 'JetBrains Mono', size: 10 },
                                     callback: v => '₹' + v.toLocaleString('en-IN')
                                 }
                             }
