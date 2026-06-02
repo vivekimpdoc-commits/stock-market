@@ -5,41 +5,75 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Indian Stock Market AI Dashboard</title>
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
     <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --bg-color: #0b1121;
-            --panel-bg: rgba(17, 24, 39, 0.65);
+            --bg-color: #050505;
+            --bg-surface: #0a0a0a;
+            --bg-surface-hover: #121212;
+            --panel-bg: #0a0a0a;
             --border-color: rgba(255, 255, 255, 0.08);
-            --accent-blue: #3b82f6; 
+            --accent-blue: #2563eb; 
             --accent-gold: #f59e0b;
-            --text-color: #f8fafc;
-            --text-muted: #94a3b8;
+            --text-color: #f5f5f5;
+            --text-muted: #a3a3a3;
             --success-color: #10b981;
-            --success-bg: rgba(16, 185, 129, 0.15);
+            --success-bg: rgba(16, 185, 129, 0.1);
             --danger-color: #ef4444;
-            --danger-bg: rgba(239, 68, 68, 0.15);
-            --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            --border-radius: 12px;
+            --danger-bg: rgba(239, 68, 68, 0.1);
+            --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            --border-radius: 6px;
+            --font-sans: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         body {
-            font-family: 'Outfit', sans-serif;
+            font-family: var(--font-sans);
             background-color: var(--bg-color);
-            background-image: radial-gradient(circle at 50% -20%, #1e3a8a 0%, transparent 40%), radial-gradient(circle at -10% 80%, rgba(245, 158, 11, 0.05) 0%, transparent 30%);
             color: var(--text-color);
             min-height: 100vh;
             display: flex;
+            overflow: hidden; /* Sidebar layout prevents body scroll */
+        }
+
+        .mono-num {
+            font-family: var(--font-mono);
+            letter-spacing: -0.5px;
+        }
+        
+        /* Layout Grid */
+        .app-layout {
+            display: flex;
+            width: 100vw;
+            height: 100vh;
+        }
+        
+        .sidebar {
+            width: 260px;
+            background: var(--bg-surface);
+            border-right: 1px solid var(--border-color);
+            display: flex;
             flex-direction: column;
-            overflow-x: hidden;
+            flex-shrink: 0;
+        }
+        
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            background: var(--bg-color);
+            position: relative;
         }
 
         /* Top Bar */
